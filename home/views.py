@@ -37,5 +37,3 @@ def registration(request):
             return redirect('login')
 
     return render(request, 'registration/registration.html', {'form': form})
-
-

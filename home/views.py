@@ -4,13 +4,17 @@ from django.shortcuts import render, redirect
 from django.views import View
 from pygments.lexers import r
 
+#testing
+from django.template.loader import get_template
+from django.http import HttpResponse
+
 from .forms import  RegistrationForm
 
 # Create your views here.
-def landingpage(request):
-    return render(request, 'home/landingpage.html')
+def homepage(request):
+    return render(request, 'home/homepage.html')
 
-def login(request):
+def login_page(request):
 
     if request.method == "POST":
         email = request.POST.get('email')
@@ -37,3 +41,4 @@ def registration(request):
             return redirect('login')
 
     return render(request, 'registration/registration.html', {'form': form})
+

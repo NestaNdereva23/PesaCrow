@@ -10,6 +10,9 @@
 .bg-secondaryblue {
     background-color: theme('colors.secondaryblue');
 }
+.bg-profile_gray {
+    background-color: theme('colors.profile_gray');
+}
 
 .font-custom{
     font-family: theme('fontFamily.custom'), serif;

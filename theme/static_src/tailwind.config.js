@@ -45,7 +45,8 @@ module.exports = {
         extend: {
             colors: {
                 customBlue: "#276FBF",
-                secondaryblue: "#3F72AF"
+                secondaryblue: "#3F72AF",
+                profile_gray: "#C7C0C0",
             },
             fontFamily: {
                 sans: ["ui-sans-serif", "system-ui"],

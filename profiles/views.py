@@ -6,7 +6,7 @@ from django.views import generic
 from django_browser_reload.views import message
 
 from profiles.models import UserProfile, UserRole
-from profiles.forms import ProfileUpdateForm
+from profiles.forms import ProfileUpdateForm, ContactUpdateForm
 
 
 # Create your views here.
@@ -23,6 +23,7 @@ def profiles(request):
 
     #userprofile update form
     form_profile = ProfileUpdateForm(data=request.POST, instance=user)
+    form_contact = ContactUpdateForm(data=request.POST, instance=user_profile)
 
     if request.method == "POST":
         if 'formProfile_submit' in request.POST:
@@ -30,8 +31,16 @@ def profiles(request):
             if form_profile.is_valid():
                 form_profile.save()
                 return redirect(reverse('home:dashboard'))
+        
+        elif 'formContact_submit' or 'form_mpesa_number_submit' in request.POST:
+            form_contact = ContactUpdateForm(data=request.POST, instance=user_profile)
+            if form_contact.is_valid():
+                form_contact.save()
+                return redirect(reverse('home:dashboard'))
+
     else:
         form_profile = ProfileUpdateForm(instance=user)
+        form_contact = ContactUpdateForm(instance=user_profile)
 
 
 
@@ -39,6 +48,7 @@ def profiles(request):
     context = {
         'user_profile': user_profile,
         'form_profile': form_profile,
+        'form_contact': form_contact,
     }
 
 

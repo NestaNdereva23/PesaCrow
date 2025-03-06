@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.views import generic
 from django_browser_reload.views import message
 
-from profiles.models import UserProfile, UserRole
+from profiles.models import UserProfile
 from profiles.forms import ProfileUpdateForm, ContactUpdateForm
 
 
@@ -32,7 +32,7 @@ def profiles(request):
                 form_profile.save()
                 return redirect(reverse('home:dashboard'))
         
-        elif 'formContact_submit' or 'form_mpesa_number_submit' in request.POST:
+        elif 'formContact_submit' or 'form_mpesa_number_submit' or 'form_roletype_submit' in request.POST:
             form_contact = ContactUpdateForm(data=request.POST, instance=user_profile)
             if form_contact.is_valid():
                 form_contact.save()

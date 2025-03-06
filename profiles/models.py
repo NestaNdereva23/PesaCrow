@@ -3,19 +3,13 @@ from django.db import models
 from django.contrib.auth.models import User
 
 ROLE_TYPES = [
-    ("CLIENT", "Client"),
-    ("DEVELOPER", "Developer"),
+    ("Client", "Client"),
+    ("Developer", "Developer"),
 ]
-
-class UserRole(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    role_type = models.CharField(max_length=255, choices=ROLE_TYPES)
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    role_type = models.CharField(max_length=255, choices=ROLE_TYPES, default="CLIENT")
     phone_number = models.CharField(max_length=11, unique=True)
     mpesa_number = models.CharField(max_length=11, unique=True)
     payment_details = models.JSONField(null=True, blank=True)

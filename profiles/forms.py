@@ -12,4 +12,4 @@ class ProfileUpdateForm(forms.ModelForm):
 class ContactUpdateForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['phone_number', 'mpesa_number']
+        fields = ['role_type','phone_number', 'mpesa_number']

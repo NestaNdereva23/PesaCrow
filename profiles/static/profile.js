@@ -10,6 +10,17 @@ document.addEventListener("DOMContentLoaded", function () {
     '[data-dialog="profile-info-modal"]'
   );
 
+  //account type modal
+  const accountTypeModalButton = document.querySelector(
+    '[data-dialog-target="account-type-modal"]'
+  );
+  const accountTypeModalBackdrop = document.querySelector(
+    '[data-dialog-backdrop="account-type-modal"]'
+  );
+  const accountTypeModal = document.querySelector(
+    '[data-dialog="account-type-modal"]'
+  );
+
   //contact modal elements
   const contactModalButton = document.querySelector(
     '[data-dialog-target="contact-modal"]'
@@ -42,6 +53,26 @@ document.addEventListener("DOMContentLoaded", function () {
     profileModalBackdrop.classList.add("pointer-events-none", "opacity-0");
   }
 
+  // func to open account type modal
+  function openAccountTypeModal() {
+    accountTypeModalBackdrop.classList.remove(
+      "pointer-events-none",
+      "opacity-0"
+    );
+    accountTypeModalBackdrop.classList.add(
+      "opacity-100",
+      "pointer-events-auto"
+    );
+  }
+  //close account type modal
+  function closeAccountTypeModal() {
+    accountTypeModalBackdrop.classList.remove(
+      "opacity-100",
+      "pointer-events-auto"
+    );
+    accountTypeModalBackdrop.classList.add("pointer-events-none", "opacity-0");
+  }
+
   // func to open contact modal
   function openContactModal() {
     contactModalBackdrop.classList.remove("pointer-events-none", "opacity-0");
@@ -69,6 +100,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Function to close all modals
   function closeAllModals() {
     closeProfileModal();
+    closeAccountTypeModal();
     closeContactModal();
     closeMpesaModal();
   }
@@ -81,6 +113,16 @@ document.addEventListener("DOMContentLoaded", function () {
       closeMpesaModal();
       //open current modal
       openProfileModal();
+    });
+  }
+
+  // Add click event to account type modal button
+  if (accountTypeModalButton) {
+    accountTypeModalButton.addEventListener("click", function () {
+      // Make sure other modals are closed first
+      closeProfileModal();
+      // Then open this modal
+      openAccountTypeModal();
     });
   }
 
@@ -112,6 +154,18 @@ document.addEventListener("DOMContentLoaded", function () {
     profileModalBackdrop.addEventListener("click", function (e) {
       if (e.target === profileModalBackdrop) {
         closeProfileModal();
+      }
+    });
+  }
+  // Close account type modal when clicking outside
+  if (
+    accountTypeModalBackdrop &&
+    accountTypeModalBackdrop.getAttribute("data-dialog-backdrop-close") ===
+      "true"
+  ) {
+    accountTypeModalBackdrop.addEventListener("click", function (e) {
+      if (e.target === accountTypeModalBackdrop) {
+        closeAccountTypeModal();
       }
     });
   }

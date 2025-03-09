@@ -1,5 +1,4 @@
-{% extends "base.html" %} 
-{% block sidebar %}
+{% extends "base.html" %} {% block sidebar %}
 <button
   data-drawer-target="default-sidebar"
   data-drawer-toggle="default-sidebar"
@@ -54,7 +53,7 @@
       </li>
       <li>
         <a
-          href="#"
+          href="{% url 'projects:projectrequest' %}"
           class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
         >
           <svg
@@ -71,8 +70,7 @@
           <span class="flex-1 ms-3 whitespace-nowrap">Projects</span>
           <span
             class="inline-flex items-center justify-center px-2 ms-3 text-sm font-medium text-gray-800 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300"
-            >Pro</span
-          >
+          ></span>
         </a>
       </li>
       <li>
@@ -138,7 +136,7 @@
       </li>
       <li>
         <a
-          href="#"
+          href="{% url 'home:logout' %}"
           class="flex items-center mt-64 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
         >
           <svg

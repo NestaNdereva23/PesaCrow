@@ -1,0 +1,89 @@
+{% load static %} {% include "sidebar.html" %} {% block content %}
+
+<div class="p-4 sm:ml-64">
+  <p class="text-2xl m-2 font-semibold tracking-tight leading-none text-black">
+    Projects
+  </p>
+  <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
+
+  <div class="flex h-60 mt-10">
+    <div class="w-1/2 md:">
+      <div
+        class="w-full m-2 max-w-lg p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8 dark:bg-customBlue dark:border-gray-700"
+      >
+        <form method="post" class="w-sm space-y-4 md:space-y-6">
+          {% csrf_token %}
+          <div class="flex items-center justify-center m-0 p-0">
+            <p class="m-2 text-lg">Create a project request</p>
+          </div>
+          <div>
+            <label
+              for="username"
+              class="block mb-2 text-sm font-medium text-white"
+              >Project Title</label
+            >
+            <input
+              type="text"
+              name="project_title"
+              id="project_title"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+              placeholder=""
+            />
+          </div>
+          <div>
+            <label
+              for="project_description"
+              class="block mb-2 text-sm font-medium text-white"
+              >Project Description</label
+            >
+            <input
+              type="text"
+              name="project_description"
+              id="project_description"
+              class="bg-gray-50 border h-28 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+              placeholder="project Description"
+            />
+          </div>
+          <div>
+            <label
+              for="project_budget"
+              class="block mb-2 text-sm font-medium text-white"
+              >Project Budget</label
+            >
+            <input
+              type="number"
+              name="project_budget"
+              id="project_budget"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+              placeholder="project budget"
+            />
+          </div>
+          <div class="flex flex-wrap gap-4">
+            <div>
+              <label
+                for="recipient_email"
+                class="block mb-2 text-sm font-medium text-white"
+                >Recipients Email</label
+              >
+              <input
+                type="email"
+                name="recipient_email"
+                id="recipient_email"
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                placeholder="client/org email"
+              />
+            </div>
+            <button
+              type="submit"
+              class="h-11 w-48 mt-7 p-2 text-white bg-gray-900 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+            >
+              Send
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

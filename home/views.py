@@ -1,7 +1,7 @@
 from typing import Any
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login , logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
@@ -82,3 +82,8 @@ def dashboard(request):
     return render(request, 'home/dashboard.html')
 
 
+#userlogout view
+@login_required
+def logoutPage(request):
+    logout(request)
+    return redirect(reverse('home:home'))

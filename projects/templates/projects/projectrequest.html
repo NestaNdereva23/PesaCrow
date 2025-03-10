@@ -4,7 +4,12 @@
   <p class="text-2xl m-2 font-semibold tracking-tight leading-none text-black">
     Projects
   </p>
+  {{user.username}}
   <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
+
+  {% for m in messages %}
+  <p>{{m}}</p>
+  {% endfor %}
 
   <div class="flex h-60 mt-10">
     <div class="w-1/2 md:">
@@ -17,18 +22,17 @@
             <p class="m-2 text-lg">Create a project request</p>
           </div>
           <div>
-            <label
-              for="username"
-              class="block mb-2 text-sm font-medium text-white"
+            <label for="title" class="block mb-2 text-sm font-medium text-white"
               >Project Title</label
             >
-            <input
+            <!-- <input
               type="text"
-              name="project_title"
-              id="project_title"
+              name="title"
+              id="title"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
               placeholder=""
-            />
+            /> -->
+            {{form.title}}
           </div>
           <div>
             <label
@@ -36,13 +40,14 @@
               class="block mb-2 text-sm font-medium text-white"
               >Project Description</label
             >
-            <input
+            <!-- <input
               type="text"
               name="project_description"
               id="project_description"
               class="bg-gray-50 border h-28 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
               placeholder="project Description"
-            />
+            /> -->
+            {{form.project_description}}
           </div>
           <div>
             <label
@@ -50,28 +55,30 @@
               class="block mb-2 text-sm font-medium text-white"
               >Project Budget</label
             >
-            <input
+            <!-- <input
               type="number"
-              name="project_budget"
-              id="project_budget"
+              name="budget"
+              id="budget"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
               placeholder="project budget"
-            />
+            /> -->
+            {{form.budget}}
           </div>
           <div class="flex flex-wrap gap-4">
             <div>
               <label
-                for="recipient_email"
+                for="receiver"
                 class="block mb-2 text-sm font-medium text-white"
                 >Recipients Email</label
               >
-              <input
+              <!-- <input
                 type="email"
-                name="recipient_email"
-                id="recipient_email"
+                name="receiver"
+                id="receiver"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                 placeholder="client/org email"
-              />
+              /> -->
+              {{form.receiver_email}}
             </div>
             <button
               type="submit"

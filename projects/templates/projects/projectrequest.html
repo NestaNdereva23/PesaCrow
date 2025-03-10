@@ -7,9 +7,11 @@
   {{user.username}}
   <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
 
+    {% if messages %}
   {% for m in messages %}
   <p>{{m}}</p>
   {% endfor %}
+{% endif %}
 
   <div class="flex h-60 mt-10">
     <div class="w-1/2 md:">

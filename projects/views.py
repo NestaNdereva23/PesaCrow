@@ -4,6 +4,15 @@ from projects.forms import ProjectRequestForm
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
+from projects.models import ProjectRequest
+
+#handle the recepient of the project request view
+def developers_projects(request):
+    project_requests = ProjectRequest.objects.filter(receiver_email__in=request.user.email)
+    context = {
+        "project_requests":project_requests,
+    }
+    return render(request, "projects/developers_projects.html", context)
 
 def projectrequest(request):
     user = request.user
@@ -51,10 +60,17 @@ def projectrequest(request):
             print(form.errors)
             messages.error(request, "Project request not sent")
             return redirect(reverse('projects:projectrequest'))
-    
     else:
         form= ProjectRequestForm(instance=user)
 
-    context = {"form":form}
+    context = {
+        "form":form,
+    }
 
-    return render(request, "projects/projectrequest.html", context)
+    #handle projects for client and developer differently
+    if user.userprofile.role_type == 'Developer':
+        return render(request, "projects/projectrequest.html", context)
+    elif user.userprofile.role_type == 'Client':
+        return developers_projects(request)
+
+

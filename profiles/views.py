@@ -35,8 +35,12 @@ def profiles(request):
         elif 'formContact_submit' or 'form_mpesa_number_submit' or 'form_roletype_submit' in request.POST:
             form_contact = ContactUpdateForm(data=request.POST, instance=user_profile)
             if form_contact.is_valid():
-                form_contact.save()
+                user_profile = form_contact.save(commit=False)
+                user_profile.user = request.user
+                user_profile.save()
                 return redirect(reverse('home:dashboard'))
+            else:
+                print(form_contact.errors)
 
     else:
         form_profile = ProfileUpdateForm(instance=user)

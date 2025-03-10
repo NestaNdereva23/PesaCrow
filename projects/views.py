@@ -8,7 +8,8 @@ from projects.models import ProjectRequest
 
 #handle the recepient of the project request view
 def developers_projects(request):
-    project_requests = ProjectRequest.objects.filter(receiver_email__in=request.user.email)
+    project_requests = ProjectRequest.objects.filter(receiver_email=request.user.email)
+    print(ProjectRequest.objects.filter(receiver_email=request.user.email).query)
     context = {
         "project_requests":project_requests,
     }
@@ -68,9 +69,9 @@ def projectrequest(request):
     }
 
     #handle projects for client and developer differently
-    if user.userprofile.role_type == 'Developer':
+    if user.userprofile.role_type == 'Client':
         return render(request, "projects/projectrequest.html", context)
-    elif user.userprofile.role_type == 'Client':
+    elif user.userprofile.role_type == 'Developer':
         return developers_projects(request)
 
 

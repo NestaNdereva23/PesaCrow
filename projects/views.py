@@ -1,20 +1,53 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from projects.forms import ProjectRequestForm
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
 from projects.models import ProjectRequest
+from django.contrib.auth.decorators import login_required
+
 
 #handle the recepient of the project request view
+@login_required
 def developers_projects(request):
+    user = request.user
     project_requests = ProjectRequest.objects.filter(receiver_email=request.user.email)
     # print(ProjectRequest.objects.filter(receiver_email=request.user.email).query)
+    
     context = {
         "project_requests":project_requests,
     }
     return render(request, "projects/developers_projects.html", context)
 
+
+'''
+    Accept project change status from pending to active
+    Send notification email to client when developer accepts the 
+    project request sent.
+'''
+@login_required
+def accept_project(request, project_id):
+    project = get_object_or_404(ProjectRequest, id=project_id, receiver_email=request.user.email)
+
+    if project.status == 'Pending':
+        project.status  = 'Active'
+        project.save()
+
+        #send email to client
+        send_mail(
+            subject = f'Your project has been accpeted',
+            message = f"Hello, your project '{project.title}' has been accepted by {request.user.email}.",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[project.sender_email],
+            fail_silently=False,
+        )
+
+        return redirect(reverse('home:dashboard'))
+
+    
+
+#client project request handling
 def projectrequest(request):
     user = request.user
     form = ProjectRequestForm(data=request.POST)

@@ -1,19 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 .bg-customBlue {
-  background-color: theme('colors.customBlue');
+  background-color: theme("colors.customBlue");
 }
 .bg-secondaryblue {
-    background-color: theme('colors.secondaryblue');
+  background-color: theme("colors.secondaryblue");
 }
 .bg-profile_gray {
-    background-color: theme('colors.profile_gray');
+  background-color: theme("colors.profile_gray");
+}
+.bg-active_green {
+  background-color: theme("colors.active_green");
 }
 
-.font-custom{
-    font-family: theme('fontFamily.custom'), serif;
+.font-custom {
+  font-family: theme("fontFamily.custom"), serif;
 }

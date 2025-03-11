@@ -7,13 +7,11 @@
   {{user.username}}
   <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
 
-    {% if messages %}
-  {% for m in messages %}
+  {% if messages %} {% for m in messages %}
   <p>{{m}}</p>
-  {% endfor %}
-{% endif %}
+  {% endfor %} {% endif %}
 
-  <div class="flex h-60 mt-10">
+  <div class="flex flex-wrap h-60 mt-10">
     <div class="w-1/2 md:">
       <div
         class="w-full m-2 max-w-lg p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8 dark:bg-customBlue dark:border-gray-700"
@@ -92,6 +90,51 @@
         </form>
       </div>
     </div>
+
+    <!-- handle project requests -->
+    <!-- {% if client_projectrequests %}  -->
+    {% for request in client_projectrequests %}
+    <div>
+      <p class="m-2">Active projects</p>
+
+      <div
+        class="max-w-lg h-60 p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-customBlue dark:border-gray-700"
+      >
+        <a href="#">
+          <h5
+            class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white"
+          >
+            Project Title: {{request.title}}
+          </h5>
+        </a>
+        <hr class="h-px bg-gray-200 border-0 dark:bg-gray-700" />
+        <div class="flow-root">
+          <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+            <li class="py-3 sm:py-4">
+              <div class="flex items-center">
+                <div class="shrink-0">
+                  <p>Project Description:</p>
+                </div>
+                <div class="flex-1 min-w-0 ms-4">
+                  <p
+                    class="text-sm font-medium text-gray-900 truncate dark:text-white"
+                  >
+                    {{ request.project_description|truncatechars:50 }}
+                  </p>
+                </div>
+                <div
+                  class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white"
+                >
+                  Budget:Ksh. {{ request.budget }}
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    <!-- {% endif %} -->
   </div>
 </div>
 

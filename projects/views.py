@@ -9,7 +9,7 @@ from projects.models import ProjectRequest
 #handle the recepient of the project request view
 def developers_projects(request):
     project_requests = ProjectRequest.objects.filter(receiver_email=request.user.email)
-    print(ProjectRequest.objects.filter(receiver_email=request.user.email).query)
+    # print(ProjectRequest.objects.filter(receiver_email=request.user.email).query)
     context = {
         "project_requests":project_requests,
     }
@@ -64,8 +64,13 @@ def projectrequest(request):
     else:
         form= ProjectRequestForm(instance=user)
 
+    #filter sent project request
+    client_projectrequests = ProjectRequest.objects.filter(user=request.user)
+    
+
     context = {
         "form":form,
+        "client_projectrequests": client_projectrequests,
     }
 
     #handle projects for client and developer differently

@@ -57,6 +57,19 @@
       class="items-center justify-between space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse"
     >
       <p class="text-start text-white">Budget: Ksh. {{ request.budget }}</p>
+        <form
+          action="{% url 'projects:milestones' request.id %}"
+          method="post"
+        >
+          {% csrf_token %}
+        <button
+            type="submit"
+            name = "create_milestones"
+            class="w-40 text-white bg-gray-900 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+          >
+            Create Milestones
+        </button>
+        </form>
       <div>
         <form
           action="{% url 'projects:accept_project' request.id %}"

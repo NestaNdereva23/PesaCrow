@@ -30,22 +30,22 @@ def developers_projects(request):
 def accept_project(request, project_id):
     project = get_object_or_404(ProjectRequest, id=project_id, receiver_email=request.user.email)
 
-    if project.status == 'Pending':
-        project.status  = 'Active'
-        project.save()
+    if 'create_milestones' in request.POST:
+        return create_milestones(request, project_id)
+    else:
+        if project.status == 'Pending':
+            project.status  = 'Active'
+            project.save()
 
-        #send email to client
-        send_mail(
-            subject = f'Your project has been accpeted',
-            message = f"Hello, your project '{project.title}' has been accepted by {request.user.email}.",
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[project.sender_email],
-            fail_silently=False,
-        )
-
-        return redirect(reverse('home:dashboard'))
-
-    
+            #send email to client
+            send_mail(
+                subject = f'Your project has been accpeted',
+                message = f"Hello, your project '{project.title}' has been accepted by {request.user.email}.",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[project.sender_email],
+                fail_silently=False,
+            )
+            return redirect(reverse('home:dashboard'))
 
 #client project request handling
 def projectrequest(request):
@@ -113,3 +113,13 @@ def projectrequest(request):
         return developers_projects(request)
 
 
+def create_milestones(request, project_id):
+    user = request.user
+    project = get_object_or_404(ProjectRequest, id=project_id)
+    project2 = ProjectRequest.objects.get(id=project_id)
+
+
+    context = {
+
+    }
+    return render(request, "projects/milestones.html", context)

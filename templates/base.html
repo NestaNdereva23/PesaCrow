@@ -2,22 +2,19 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>PesaCrow</title>
+    <script
+      src="https://unpkg.com/htmx.org@2.0.4"
+      integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"
+      crossorigin="anonymous"
+    ></script>
     {% tailwind_css %}
-</head>
-<body class="font-custom">
+  </head>
+  <body class="font-custom">
     {% block navbar %}
-    {% endblock %}
 
-    {% block sidebar %}
-    {% endblock %}
-
-    {% block content %}
-    {% endblock %}
-
-    {% block footer %}
-    {% endblock %}
-</body>
+    {% endblock %} {% block sidebar %} {% endblock %} {%block content %} {% endblock %} {% block footer %} {% endblock %}
+  </body>
 </html>

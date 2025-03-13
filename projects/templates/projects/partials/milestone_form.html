@@ -1,0 +1,20 @@
+
+{% block content %}
+<form
+  hx-post="{% url 'projects:milestones' project.id %}"
+  hx-swap="outerHTML"
+  hx-target="this"
+>
+  {% csrf_token %} {{ form.as_p }}
+  <input type="hidden" name="order_number" value="{{ next_order_number }}" />
+  <button type="submit">Save Milestone</button>
+  <button
+    type="button"
+    hx-get="{% url 'projects:milestones' project.id %}?action=cancel"
+    hx-target="this"
+    hx-swap="outerHTML"
+  >
+    Cancel
+  </button>
+</form>
+{% endblock %}

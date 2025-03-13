@@ -1,0 +1,32 @@
+<div class="milestone-item" id="milestone-{{ milestone.id }}">
+  <div class="w-1/2 p-4 mt-5 text-center bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8 dark:bg-customBlue">
+    <h5 class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
+      {{milestone.title }}
+    </h5>
+    <p class="mb-5 text-start text-gray-950 sm:text-lg dark:text-gray-950">
+      {{ milestone.description }}
+    </p>
+    <p class="mb-5 text-start text-gray-950 sm:text-lg dark:text-gray-950">
+      Deliverables: {{ milestone.deliverables }}
+    </p>
+    <p class="text-start text-white">
+      Payment: Ksh. {{ milestone.payment_amount }}
+    </p>
+    <p class="text-start text-white">
+      Due: {{ milestone.estimated_completion }}
+    </p>
+    <p class="text-start text-red-600">Status: {{ milestone.status }}</p>
+    <div class="items-center justify-between space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse">
+      <p></p>
+      <button
+        class="edit-milestone-button"
+        hx-get="{% url 'projects:edit_milestone' milestone.id %}"
+        hx-target="#edit-milestone-modal"
+        hx-swap="innerHTML"
+        hx-trigger="click"
+      >
+        Edit
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,11 +1,14 @@
+from django.db.models import Max
+from django.http import HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from projects.forms import ProjectRequestForm
+from projects.forms import ProjectRequestForm, MilestonesForm, EditMilestoneForm
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
-from projects.models import ProjectRequest
+from projects.models import ProjectRequest, Milestone
 from django.contrib.auth.decorators import login_required
+from django.template.loader import render_to_string
 
 
 #handle the recepient of the project request view
@@ -116,10 +119,70 @@ def projectrequest(request):
 def create_milestones(request, project_id):
     user = request.user
     project = get_object_or_404(ProjectRequest, id=project_id)
-    project2 = ProjectRequest.objects.get(id=project_id)
+    project_requests = ProjectRequest.objects.filter(receiver_email=request.user.email)
+    
+    # print(ProjectRequest.objects.filter(receiver_email=request.user.email).query)
+    #check for permission
+    if project.receiver_email != request.user.email:
+        return HttpResponseForbidden("You dont have permission to create milestones for this project.")
 
+    #get existing milestones
+    milestones = Milestone.objects.filter(project=project).order_by('order_number')
 
+    #add milestones dynamically using htmx
+    if request.method == 'POST' and request.headers.get('HX-Request'):
+        form = MilestonesForm(data=request.POST, project=project)
+        if form.is_valid():
+            milestone = form.save(commit=False)
+
+            if not milestone.order_number:
+                last_order = milestones.aggregate(Max('order_number'))['order_number__max'] or 0
+                milestone.order_number = last_order + 1
+
+            milestone.save()
+
+            #return only the new html for htmx to insert
+            return render(request, "projects/partials/milestone_item.html", {"milestones":milestones})
+        else:
+            return render(request, "projects/partials/milestone_form.html", {
+                "form": form,
+                "project": project
+            })
+
+    #display milestone_form via htmx
+    if request.headers.get('HX-Request') and request.GET.get('action') == 'new_form':
+        form = MilestonesForm(project=project)
+        return render(request, "projects/partials/milestone_form.html", {
+            "form": form,
+            "project": project
+        })
+
+    #default page load
     context = {
+        "milestones":milestones,
+        "project":project,
+        "project_requests":project_requests,
+        "new_milestone_form": MilestonesForm(project=project),
 
     }
     return render(request, "projects/milestones.html", context)
+
+
+def edit_milestone(request, milestone_id):
+    milestone = get_object_or_404(Milestone, id=milestone_id)
+    project=milestone.project
+    form = EditMilestoneForm(instance=milestone)
+
+    if request.method == "POST":
+        form = EditMilestoneForm(data=request.POST, instance=milestone)
+        if form.is_valid():
+            form.save()
+            # return redirect(reverse('projects:milestones', project.id))
+            return HttpResponse('<div id="milestone-{}" hx-swap-oob="true">{}</div>'.format(milestone.id, milestone.title))
+            # Updates the milestone without full reload
+        else:
+            return render(request, "projects/partials/edit_milestone_form.html", {"form": form, "milestone": milestone})
+
+    form = EditMilestoneForm(instance=milestone)
+    return render(request, "projects/partials/edit_milestone_form.html", {"form": form, "milestone": milestone})
+

@@ -1,7 +1,85 @@
 {% load static %} {% include "sidebar.html" %} {% block content %}
+<script src="{% static 'project.js' %}"></script>
+
 <div class="p-4 sm:ml-64">
   <p class="text-2xl m-2 font-semibold tracking-tight leading-none text-black">
     Project Milestones
   </p>
+  <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
+
+  <!-- filtered projects section -->
+  {% if project_requests %} 
+  {% for request in project_requests %}
+  <div
+    class="w-full p-4 mt-5 text-center bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8 dark:bg-customBlue"
+  >
+    <h5 class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
+      {{ request.title }}
+    </h5>
+    <p class="text-start text-white">Client: {{request.sender_email}}</p>
+    <p class="mb-5 text-start text-gray-950 sm:text-lg dark:text-gray-950">
+      Description: {{ request.project_description|truncatechars:100 }}
+    </p>
+    <p class="text-start">Created: {{ request.created_at|date:"M d, Y" }}</p>
+    <p class="text-start text-red-600">Status: {{ request.status}}</p>
+    <div
+      class="items-center justify-between space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse"
+    >
+      <p class="text-start text-white">Budget: Ksh. {{ request.budget }}</p>
+    </div>
+  </div>
+  {% endfor %} 
+  {% else %}
+  <p>No project requests found.</p>
+  {% endif %}
+
+  <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
+
+  <!-- milestone title -->
+  <p class="text-xl m-2 font-semibold tracking-tight leading-none text-black">
+    Create Milestones
+  </p>
+
+  <!-- created milestones section -->
+  <div id="milestones-container">
+    {% for milestone in milestones %}
+    {% include "projects/partials/milestone_item.html" with milestone=milestone %}
+    {% endfor %}
+  </div>
+
+  <!-- milestone form section -->
+  <!-- <div>{% include "projects/partials/milestone_form.html" %}</div> -->
+  <div id="new-milestone-form"></div>
+
+  <!-- create milestone button -->
+  <div>
+    <button
+      hx-get="{% url 'projects:milestones' project.id %}?action=new_form"
+      hx-target="#new-milestone-form"
+      hx-swap="innerHTML"
+      type="submit"
+      class="w-40 text-white bg-green-950 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+    >
+      Create milestone
+    </button>
+  </div>
 </div>
+
+<!-- edit milestone modal -->
+<div
+  data-dialog-backdrop="edit-milestone-modal"
+  data-dialog-backdrop-close="true"
+  class="pointer-events-none fixed inset-0 z-[999] grid h-screen w-screen place-items-center bg-black bg-opacity-60 opacity-0 backdrop-blur-sm transition-opacity duration-300"
+>
+  <div
+    data-dialog="edit-milestone-modal"
+    class="relative mx-auto w-full max-w-[24rem] rounded-lg overflow-hidden shadow-sm"
+  >
+    <div id="edit-milestone-modal" class="relative flex flex-col bg-white">
+      <!-- The edit form will be loaded here -->
+    </div>
+  </div>
+</div>
+
+
 {% endblock %}

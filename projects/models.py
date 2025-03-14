@@ -15,6 +15,7 @@ class ProjectRequest(models.Model):
     project_description = models.TextField(max_length=1000)
     status = models.CharField(max_length=255, choices=PROJECT_STATUS, default="Pending")
     budget = models.DecimalField(decimal_places=2, max_digits=12, null=True)
+    verified = models.BooleanField(default=False)
     requirements = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

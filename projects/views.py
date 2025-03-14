@@ -53,67 +53,74 @@ def accept_project(request, project_id):
 #client project request handling
 def projectrequest(request):
     user = request.user
-    form = ProjectRequestForm(data=request.POST)
-    
-    #handle clients project request form
-    if request.method == "POST":
-        if form.is_valid():
-            project_request = form.save(commit=False)
-            project_request.user = request.user
-            project_request.save()
-
-            #Send email notification to recipient
-            subject = f'New project request: {project_request.title}'
-            message = f'''
-
-            Hello,
-
-            You have received a new project request from {request.user.username}.
-
-            Project Details:
-            Title: {project_request.title}
-            Description: {project_request.project_description}
-            Budget: Ksh. {project_request.budget}
-
-            Please login to your dashboard to view more details and respond.
-
-            Best regards,
-            PesaCrow Team
-            '''
-
-            send_mail(
-                subject,
-                message,
-                settings.DEFAULT_FROM_EMAIL,
-                [project_request.receiver_email],
-                fail_silently=False,
-            )
-            
-            #handle success message
-            messages.success(request, "Project request sent successfully!")
-            
-            return redirect(reverse("home:dashboard"))
-        else:
-            print(form.errors)
-            messages.error(request, "Project request not sent")
-            return redirect(reverse('projects:projectrequest'))
-    else:
-        form= ProjectRequestForm(instance=user)
-
-    #filter sent project request
-    client_projectrequests = ProjectRequest.objects.filter(user=request.user)
-    
-
-    context = {
-        "form":form,
-        "client_projectrequests": client_projectrequests,
-    }
-
-    #handle projects for client and developer differently
-    if user.userprofile.role_type == 'Client':
-        return render(request, "projects/projectrequest.html", context)
-    elif user.userprofile.role_type == 'Developer':
+    if user.userprofile.role_type == 'Developer':
         return developers_projects(request)
+    elif user.userprofile.role_type == 'Client':
+
+        form = ProjectRequestForm(data=request.POST)
+
+        #handle clients project request form
+        if request.method == "POST":
+            if form.is_valid():
+                project_request = form.save(commit=False)
+                project_request.user = request.user
+                project_request.save()
+
+                #Send email notification to recipient
+                subject = f'New project request: {project_request.title}'
+                message = f'''
+    
+                Hello,
+    
+                You have received a new project request from {request.user.username}.
+    
+                Project Details:
+                Title: {project_request.title}
+                Description: {project_request.project_description}
+                Budget: Ksh. {project_request.budget}
+    
+                Please login to your dashboard to view more details and respond.
+    
+                Best regards,
+                PesaCrow Team
+                '''
+
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [project_request.receiver_email],
+                    fail_silently=False,
+                )
+
+                #handle success message
+                messages.success(request, "Project request sent successfully!")
+
+                return redirect(reverse("home:dashboard"))
+            else:
+                print(form.errors)
+                messages.error(request, "Project request not sent")
+                return redirect(reverse('projects:projectrequest'))
+        else:
+            form= ProjectRequestForm(instance=user)
+
+        #filter sent project request
+        client_project = get_object_or_404(ProjectRequest, sender_email=request.user.email)
+        project = ProjectRequest.objects.filter(id=client_project.id)
+
+        # handle projects for client and developer differently
+
+        if client_project.sender_email == user.email:
+            client_projectrequests = ProjectRequest.objects.filter(sender_email=user.email)
+
+            context = {
+                "form":form,
+                "project": project,
+                "client_projectrequests": client_projectrequests,
+            }
+
+            return render(request, "projects/projectrequest.html", context)
+
 
 
 def create_milestones(request, project_id):
@@ -157,6 +164,24 @@ def create_milestones(request, project_id):
             "project": project
         })
 
+    #notify client contract is finished
+    if request.method == 'POST' and "verify_milestones" in request.POST and project.verified == False:
+        #send notification email to sender/client
+        send_mail(
+            subject=f'Milestone Verification for Project: {project.title}',
+            message=
+            f'''Hello, the developer {request.user.email} has added milestones to '{project.title}'.
+            Visit your project dashboard to verify that the milestones align within your scope.
+            . If it aligns click on approve button to generate a contract else communicate with the developer until every milestone aligns
+             .''',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[project.sender_email],
+            fail_silently=False,
+        )
+        return redirect(reverse('home:dashboard'))
+    else:
+        return HttpResponseForbidden("Something went wrong when sending notification")
+
     #default page load
     context = {
         "milestones":milestones,
@@ -186,3 +211,20 @@ def edit_milestone(request, milestone_id):
     form = EditMilestoneForm(instance=milestone)
     return render(request, "projects/partials/edit_milestone_form.html", {"form": form, "milestone": milestone})
 
+
+def client_milestone_verification(request, id):
+    user = request.user
+    project = get_object_or_404(ProjectRequest, id=id)
+
+    # Get milestones for this project
+    milestones = Milestone.objects.filter(project=project).order_by('order_number')
+
+    # Check if user is the sender of this project request
+    if project.sender_email != user.email:
+        return HttpResponseForbidden("You don't have permission to view these milestones")
+
+    # If we get here, user is authorized to see the milestones
+    return render(request, "projects/client_milestones.html", {
+        "project": project,
+        "milestones": milestones
+    })

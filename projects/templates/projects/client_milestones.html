@@ -1,0 +1,60 @@
+{% load static %} {% include "sidebar.html" %} {% block content %}
+
+<div class="p-4 sm:ml-64">
+  <p class="text-2xl m-2 font-semibold tracking-tight leading-none text-black">
+    Projects
+  </p>
+  {{user.username}}
+  <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
+
+<div class="container mx-auto py-6">
+    <h2 class="text-2xl font-bold mb-4">Project: {{ project.title }}</h2>
+    
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h3 class="text-lg font-semibold mb-2">Project Details</h3>
+        <p><strong>Description:</strong> {{ project.project_description }}</p>
+        <p><strong>Budget:</strong> Ksh. {{ project.budget }}</p>
+        <p><strong>Status:</strong> {{ project.status }}</p>
+    </div>
+    
+    <h3 class="text-xl font-bold mb-4">Milestones</h3>
+    
+    {% if milestones %}
+        <div class="space-y-4">
+            {% for milestone in milestones %}
+                <div class="bg-white rounded-lg shadow p-4 border-l-4 {% if milestone.status == 'Completed' %}border-green-500{% elif milestone.status == 'Active' %}border-blue-500{% else %}border-gray-300{% endif %}">
+                    <h4 class="font-semibold text-lg">{{ milestone.title }}</h4>
+                    <p class="text-sm text-gray-600 mb-2">{{ milestone.description }}</p>
+                    
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                            <span class="font-medium">Deliverables:</span>
+                            <span>{{ milestone.deliverables }}</span>
+                        </div>
+                        <div>
+                            <span class="font-medium">Payment:</span>
+                            <span>Ksh. {{ milestone.payment_amount }}</span>
+                        </div>
+                        <div>
+                            <span class="font-medium">Estimated completion:</span>
+                            <span>{{ milestone.estimated_completion }}</span>
+                        </div>
+                        <div>
+                            <span class="font-medium">Status:</span>
+                            <span class="px-2 py-1 rounded text-xs {% if milestone.status == 'Completed' %}bg-green-100 text-green-800{% elif milestone.status == 'Active' %}bg-blue-100 text-blue-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ milestone.status }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="bg-gray-50 p-4 rounded-lg text-center">
+            <p>No milestones have been created for this project yet.</p>
+        </div>
+    {% endif %}
+</div>
+    </div>
+{% endblock %}
+

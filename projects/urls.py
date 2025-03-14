@@ -12,4 +12,6 @@ urlpatterns = [
 
     path("developer/projects/milestones/<int:milestone_id>/edit/", views.edit_milestone, name="edit_milestone"),
 
+    path("milestones/<int:id>/", views.client_milestone_verification, name="client_verify_milestone"),
+
 ]

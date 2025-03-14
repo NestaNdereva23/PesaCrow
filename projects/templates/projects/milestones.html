@@ -27,18 +27,18 @@
       class="items-center justify-between space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse"
     >
       <p class="text-start text-white">Budget: Ksh. {{ request.budget }}</p>
-        <div>
-            <form method="post">
-            {% csrf_token %}
+    <div>
+        <form method="post">
+        {% csrf_token %}
             <button
                 name="verify_milestones"
                 type="submit"
                 class="text-white bg-lime-700 hover:bg-lime-950 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-300-600 dark:hover:bg-gray-50-700 focus:outline-none dark:focus:ring-gray-800-800">
                 Verify milestones
             </button>
-            </form>
+        </form>
+    </div>
 
-        </div>
     </div>
   </div>
   {% endfor %} 

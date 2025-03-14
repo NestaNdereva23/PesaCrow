@@ -15,9 +15,38 @@
         <p><strong>Description:</strong> {{ project.project_description }}</p>
         <p><strong>Budget:</strong> Ksh. {{ project.budget }}</p>
         <p><strong>Status:</strong> {{ project.status }}</p>
+        <p><strong>verified:</strong> {{ project.verified }}</p>
     </div>
     
-    <h3 class="text-xl font-bold mb-4">Milestones</h3>
+
+    <div
+      class="flex bg-gray-300 justify-between space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse"
+    >
+      <h3 class="text-xl font-bold mb-4">Milestones</h3>
+        <div class="items-center justify-center" >
+            <form method="post">
+            {% csrf_token %}
+            <button
+                name="approve_milestones"
+                type="submit"
+                class="text-white bg-lime-700 hover:bg-lime-950 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-300-600 dark:hover:bg-gray-50-700 focus:outline-none dark:focus:ring-gray-800-800">
+                Approve milestones
+            </button>
+            </form>
+        </div>
+        <div>
+            <form method="post">
+            {% csrf_token %}
+            <button
+                name="disapprove_milestones"
+                type="submit"
+                class="text-white bg-lime-700 hover:bg-lime-950 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-300-600 dark:hover:bg-gray-50-700 focus:outline-none dark:focus:ring-gray-800-800">
+                Diaspprove milestones
+            </button>
+            </form>
+        </div>
+    </div>
+
     
     {% if milestones %}
         <div class="space-y-4">
@@ -45,6 +74,7 @@
                                 {{ milestone.status }}
                             </span>
                         </div>
+
                     </div>
                 </div>
             {% endfor %}

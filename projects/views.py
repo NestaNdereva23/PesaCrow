@@ -169,11 +169,11 @@ def create_milestones(request, project_id):
         #send notification email to sender/client
         send_mail(
             subject=f'Milestone Verification for Project: {project.title}',
-            message=
-            f'''Hello, the developer {request.user.email} has added milestones to '{project.title}'.
-            Visit your project dashboard to verify that the milestones align within your scope.
-            . If it aligns click on approve button to generate a contract else communicate with the developer until every milestone aligns
-             .''',
+            message=f'''
+            Hello, the developer {request.user.email} has added milestones to '{project.title}'.\n
+            Visit your project dashboard to verify that the milestones align within your scope.\n
+            .If it aligns click on approve button to generate a contract else communicate with the developer until every milestone aligns.
+            ''',
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[project.sender_email],
             fail_silently=False,
@@ -212,6 +212,7 @@ def edit_milestone(request, milestone_id):
     return render(request, "projects/partials/edit_milestone_form.html", {"form": form, "milestone": milestone})
 
 
+#allows client to view and approve milestones added/update  by developer
 def client_milestone_verification(request, id):
     user = request.user
     project = get_object_or_404(ProjectRequest, id=id)
@@ -222,6 +223,41 @@ def client_milestone_verification(request, id):
     # Check if user is the sender of this project request
     if project.sender_email != user.email:
         return HttpResponseForbidden("You don't have permission to view these milestones")
+
+    if request.method == 'POST' and "approve_milestones" in request.POST and project.verified == False:
+        #approve project verification status
+        project.verified = True
+        project.save()
+        #send notification email to sender/client
+        send_mail(
+            subject=f'Milestone Verification for Project: {project.title}',
+            message=f'''
+                    Hello, the client {project.sender_email} approved '{project.title}' and the added milestones.\n
+                    Everything seems fine. Check you contracts section to proceed.\n
+                    
+                    Best regards,\n
+                    PesaCrow Team :)
+                    ''',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[project.receiver_email],
+            fail_silently=False,
+        )
+        return redirect(reverse('home:dashboard'))
+    elif  request.method == 'POST' and "disapprove_milestones" in request.POST and project.verified == False:
+        send_mail(
+            subject=f'Milestone Verification for Project: {project.title}',
+            message=f'''
+                            Hello, the client {project.sender_email} disapproved some sections of the milestones.\n
+                            Consult with the client to address the issues.\n
+
+                            Best regards,\n
+                            PesaCrow Team :)
+                            ''',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[project.receiver_email],
+            fail_silently=False,
+        )
+        return redirect(reverse('home:dashboard'))
 
     # If we get here, user is authorized to see the milestones
     return render(request, "projects/client_milestones.html", {

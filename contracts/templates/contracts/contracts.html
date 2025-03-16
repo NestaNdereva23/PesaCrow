@@ -1,0 +1,35 @@
+{% load static %} {% include "sidebar.html" %} {% block content %}
+
+<div class="p-4 sm:ml-64">
+  <p class="text-2xl m-2 font-semibold tracking-tight leading-none text-black">
+    Contracts
+  </p>
+    {% if project %}
+    <div class="container mx-auto p-4">
+{#    <h2 class="text-xl font-semibold mb-6">{{ contract.title }}</h2>#}
+
+    {% for proj in project %}
+        <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <div class="border-b border-gray-200 pb-4 mb-4">
+                <h3 class="text-xl font-semibold">{{ proj.title }}</h3>
+            </div>
+            <pre class="whitespace-pre-wrap text-gray-700">Ksh. {{ proj.budget }}</pre>
+            <div class="flex justify-end">
+            <form method="post" action="{% url 'contracts:edit_contract' proj.contract.id %}">
+            {% csrf_token %}
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Edit Contract
+            </button>
+            </form>
+        </div>
+        </div>
+
+    {% endfor %}
+    </div>
+    {% else %}
+    <p>No verified projects</p>
+    {% endif %}
+
+</div>
+
+{% endblock %}

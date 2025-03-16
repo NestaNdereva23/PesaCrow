@@ -9,7 +9,7 @@ from django.contrib import messages
 from projects.models import ProjectRequest, Milestone
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
-
+from contracts.models import Contract
 
 #handle the recepient of the project request view
 @login_required
@@ -229,20 +229,30 @@ def client_milestone_verification(request, id):
         project.verified = True
         project.save()
         #send notification email to sender/client
-        send_mail(
-            subject=f'Milestone Verification for Project: {project.title}',
-            message=f'''
-                    Hello, the client {project.sender_email} approved '{project.title}' and the added milestones.\n
-                    Everything seems fine. Check you contracts section to proceed.\n
-                    
-                    Best regards,\n
-                    PesaCrow Team :)
-                    ''',
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[project.receiver_email],
-            fail_silently=False,
-        )
-        return redirect(reverse('home:dashboard'))
+        # send_mail(
+        #     subject=f'Milestone Verification for Project: {project.title}',
+        #     message=f'''
+        #             Hello, the client {project.sender_email} approved '{project.title}' and the added milestones.\n
+        #             Everything seems fine. Check you contracts section to proceed.\n
+        #
+        #             Best regards,\n
+        #             PesaCrow Team :)
+        #             ''',
+        #     from_email=settings.DEFAULT_FROM_EMAIL,
+        #     recipient_list=[project.receiver_email],
+        #     fail_silently=False,
+        # )
+        # Check if a contract already exists for this project
+        try:
+            contract = Contract.objects.get(project=project)
+            # If contract exists, redirect to edit page
+            return redirect('contracts:edit_contract', contract_id=contract.id)
+        except Contract.DoesNotExist:
+            # If no contract exists, create one first
+            from contracts.services import create_contract_from_template
+            contract = create_contract_from_template(project.id)
+            return redirect('contracts:edit_contract', contract_id=contract.id)
+
     elif  request.method == 'POST' and "disapprove_milestones" in request.POST and project.verified == False:
         send_mail(
             subject=f'Milestone Verification for Project: {project.title}',

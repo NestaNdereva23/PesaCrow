@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'home.apps.HomeConfig',
     'profiles.apps.ProfilesConfig',
     'projects.apps.ProjectsConfig',
+    'contracts.apps.ContractsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

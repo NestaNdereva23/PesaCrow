@@ -3,6 +3,8 @@ from . import views
 from django.urls import path
 from django.contrib.auth import views as auth_views
 
+from .views import dashboard
+
 app_name = "home"
 urlpatterns = [
     path('', views.homepage, name='home'),
@@ -17,5 +19,7 @@ urlpatterns = [
     path('password_reset_complete/', auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
 
     path('dashboard/', views.dashboard, name='dashboard'),
+
+    path('dashboard/milestone_payment/', views.milestone_payment, name='milestone_payment'),
 
 ]

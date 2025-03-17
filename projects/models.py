@@ -7,6 +7,13 @@ PROJECT_STATUS = [
     ("Completed", "Completed"),
 ]
 
+PAYMENT_STATUS = [
+    ("Unpaid", "Unpaid"),
+    ("Processing", "Processing"),
+    ("Paid", "Paid"),
+    ("Failed", "Failed"),
+]
+
 class ProjectRequest(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_requests")
     sender_email = models.EmailField(max_length=255)
@@ -19,10 +26,7 @@ class ProjectRequest(models.Model):
     requirements = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-  
-
-
+    
     def __str__(self):
         return self.title
 
@@ -34,13 +38,8 @@ class Milestone(models.Model):
     payment_amount = models.DecimalField(decimal_places=2, max_digits=12, null=True)
     estimated_completion = models.DateField()
     status = models.CharField(max_length=255, choices=PROJECT_STATUS, default="Pending")
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS, default="Unpaid")
     order_number = models.IntegerField()
-
+    
     def __str__(self):
         return f'{self.project} + {self.title}'
-
-
-
-
-
-

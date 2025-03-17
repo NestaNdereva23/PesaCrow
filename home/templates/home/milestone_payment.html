@@ -1,0 +1,111 @@
+{% load static %}
+{% include "sidebar.html" %}
+{% block content %}
+<div class="p-4 sm:ml-64">
+  <p class="text-2xl m-2 font-semibold tracking-tight leading-none text-black">
+    Make Milestone Payment
+  </p>
+  <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
+  
+  {% if milestone %}
+    <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+      <div class="mb-4">
+        <h3 class="text-lg font-medium text-gray-900">Project: {{ project.title }}</h3>
+        <p class="text-sm text-gray-500">Project ID: {{ project.id }}</p>
+      </div>
+      
+      <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-blue-700">
+              Both you and the developer have signed the contract. Please make payment for the first milestone to begin work.
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="border rounded-lg overflow-hidden">
+        <div class="bg-gray-50 px-4 py-3 border-b">
+          <h4 class="text-md font-medium text-gray-700">Milestone #{{ milestone.order_number }}: {{ milestone.title }}</h4>
+        </div>
+        
+        <div class="p-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p class="text-sm font-medium text-gray-500">Description:</p>
+              <p class="mt-1 text-sm text-gray-900">{{ milestone.description }}</p>
+            </div>
+            
+            <div>
+              <p class="text-sm font-medium text-gray-500">Deliverables:</p>
+              <p class="mt-1 text-sm text-gray-900">{{ milestone.deliverables }}</p>
+            </div>
+          </div>
+          
+          <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <p class="text-sm font-medium text-gray-500">Estimated Completion:</p>
+              <p class="mt-1 text-sm text-gray-900">{{ milestone.estimated_completion }}</p>
+            </div>
+            
+            <div>
+              <p class="text-sm font-medium text-gray-500">Status:</p>
+              <p class="mt-1 text-sm text-gray-900">{{ milestone.status }}</p>
+            </div>
+            
+            <div>
+              <p class="text-sm font-medium text-gray-500">Payment Amount:</p>
+              <p class="mt-1 text-lg font-bold text-gray-900">KES {{ milestone.payment_amount }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-6">
+        <form method="POST" action="{% url 'home:milestone_payment' %}">
+          {% csrf_token %}
+          <input type="hidden" name="milestone_id" value="{{ milestone.id }}">
+          
+          <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Pay with M-Pesa
+          </button>
+        </form>
+      </div>
+    </div>
+  {% else %}
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-yellow-700">
+            No pending milestones require payment at this time.
+          </p>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+  
+  {% if messages %}
+    <div class="mt-6">
+      {% for message in messages %}
+        <div class="bg-{{ message.tags }}-50 border-l-4 border-{{ message.tags }}-400 p-4 mb-4">
+          <div class="flex">
+            <div class="ml-3">
+              <p class="text-sm text-{{ message.tags }}-700">{{ message }}</p>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

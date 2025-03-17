@@ -7,7 +7,7 @@
 
   <div class="flex h-60 mt-10">
     <div class="w-1/2 md:">
-      <p class="m-2">Active contracts</p>
+      <p class="m-2">Active milestone</p>
       <div
         class="w-full m-2 max-w-lg p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8 dark:bg-customBlue dark:border-gray-700"
       >
@@ -26,6 +26,7 @@
         </div>
         <div class="flow-root">
           <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
+              {{ milestones.title }}
             <li class="py-3 sm:py-4">
               <div class="flex items-center">
                 <div class="shrink-0">
@@ -39,16 +40,16 @@
                   <p
                     class="text-sm font-medium text-gray-900 truncate dark:text-white"
                   >
-                    Nesta Ndereva
+                    {{ user.username }}
                   </p>
                   <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                    Contract period: 17th Jan - 3rd March
+                    {{ milestones.estimated_completion }}
                   </p>
                 </div>
                 <div
                   class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white"
                 >
-                  Ksh. 35,000
+                  Ksh. {{ milestones.payment_amount }}
                 </div>
               </div>
             </li>

@@ -20,6 +20,5 @@ urlpatterns = [
 
     path('dashboard/', views.dashboard, name='dashboard'),
 
-    path('dashboard/milestone_payment/', views.milestone_payment, name='milestone_payment'),
 
 ]

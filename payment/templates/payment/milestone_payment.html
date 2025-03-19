@@ -1,6 +1,7 @@
 {% load static %}
 {% include "sidebar.html" %}
 {% block content %}
+<script src="{% static 'payment.js' %}"></script>
 <div class="p-4 sm:ml-64">
   <p class="text-2xl m-2 font-semibold tracking-tight leading-none text-black">
     Make Milestone Payment
@@ -67,15 +68,17 @@
       </div>
       
       <div class="mt-6">
-        <form method="POST" action="{% url 'home:milestone_payment' %}">
-          {% csrf_token %}
-          <input type="hidden" name="milestone_id" value="{{ milestone.id }}">
-          
-          <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-            Pay with M-Pesa
-          </button>
-        </form>
-      </div>
+          <form id="payment-form" method="POST" action="{% url 'payment:milestone_payment' %}" onsubmit="return initiatePayment()">
+            {% csrf_token %}
+            <input type="hidden" name="milestone_id" value="{{ milestone.id }}">
+
+            <div id="payment-status" class="mb-4 text-sm text-blue-700"></div>
+
+            <button id="payment-button" type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              Pay with M-Pesa
+            </button>
+          </form>
+        </div>
     </div>
   {% else %}
     <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">

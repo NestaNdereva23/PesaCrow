@@ -22,7 +22,7 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', '72c9-41-209-57-164.ngrok-free.app']
 
 
 # Application definition
@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'profiles.apps.ProfilesConfig',
     'projects.apps.ProjectsConfig',
     'contracts.apps.ContractsConfig',
+    'payment.apps.PaymentConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -155,3 +156,10 @@ EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS')
 EMAIL_USE_SSL = env.bool('EMAIL_USE_SSL')
 DEFAULT_FROM_EMAIL  = env('DEFAULT_FROM_EMAIL')
+
+#MPESA PAYMENT INTEGRATION
+MPESA_CONSUMER_KEY= env('MPESA_CONSUMER_KEY')
+MPESA_CONSUMER_SECRET= env('MPESA_CONSUMER_SECRET')
+MPESA_SHORTCODE= env('MPESA_SHORTCODE')
+MPESA_PASSKEY= env('MPESA_PASSKEY')
+CALLBACK_URL= env('CALLBACK_URL')

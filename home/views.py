@@ -91,24 +91,36 @@ def dashboard(request):
             project_requests = ProjectRequest.objects.filter(sender_email=request.user.email, verified=True)
             payment_needed = False
             for project in project_requests:
-                    #check if contract is signed by both parties
-                    if project.status == 'Active' and project.contract.signed_by_client == True and project.contract.signed_by_developer == True:
-                        #check for pending miestone
-                        pending_milestone = Milestone.objects.filter(
-                            project=project,
-                            status='Pending',
-                            payment_status='Unpaid'
-                            ).order_by('order_number').first()
-                        
-                        if pending_milestone:
-                            #store the milestone id session for use in payment view
-                            request.session['pending_milestone_id'] = pending_milestone.id
-                            payment_needed=True
-                            break
+                    #checkif contract is verified i.e approved by the client after allmilestones have been added
+                    if project.verified == True:
+
+                        #check if there is a contract associated with the active project to avoid null error is none exists   
+                        if hasattr(project, 'contract') and project.contract is not None:
+                                
+                            if project.contract.signed_by_client == True and project.contract.signed_by_developer == True:
+                                #check for pending miestone
+                                pending_milestone = Milestone.objects.filter(
+                                    project=project,
+                                    status='Pending',
+                                    payment_status='Unpaid'
+                                    ).order_by('order_number').first()
+                            
+                                if pending_milestone:
+                                    #store the milestone id session for use in payment view
+                                    request.session['pending_milestone_id'] = pending_milestone.id
+                                    payment_needed=True
+                                    break
+                        else:
+                            #remove any sessions stored if any
+                            if 'pending_milestone_id' in request.session:
+                                del request.session['pending_milestone_id']
+                            
+                                return redirect(reverse('home:dashboard'))
+
             
             if payment_needed:
                  #Prompt payment page with the top milestone to client
-                return redirect('home:milestone_payment')
+                return redirect('payment:milestone_payment')
         except ProjectRequest.DoesNotExist:
             return HttpResponseForbidden("You dont have any project")
 
@@ -119,7 +131,7 @@ def dashboard(request):
             project_requests = ProjectRequest.objects.filter(receiver_email=request.user.email, verified=True)
             
             active_milestones = Milestone.objects.filter(
-                            project=project_requests, 
+                            project__in = project_requests, 
                             status='Active'
                             ).order_by('project','order_number')
             
@@ -131,7 +143,7 @@ def dashboard(request):
             context = {
                 "projects":project_requests,
                 "active_milestones":active_milestones,
-                "pending_milesones":pending_milestones,
+                "pending_milestones":pending_milestones,
             }
         
         except ProjectRequest.DoesNotExist:
@@ -146,71 +158,5 @@ def dashboard(request):
 def logoutPage(request):
     logout(request)
     return redirect(reverse('home:home'))
-
-def milestone_payment(request):
-    user = request.user
-    
-    project_requests = ProjectRequest.objects.filter(sender_email=request.user.email, verified=True)
-
-    context = {}
-    #check if fistname and lastname are blanks if so redirect to profile
-    if user.userprofile.role_type != 'Client':
-
-        #only client to access this page
-        return redirect(reverse('home:dashboard'))
-
-    #get the pending milestone id from session
-    pending_milestone_id = request.session.get('pending_milestone_id')
-
-    if not pending_milestone_id:
-        #if no pending milestone id in session find one
-
-        projects = ProjectRequest.objects.filter(sender_email=request.user.email, verified=True)
-
-        for project in projects:
-            #check for pending miestone
-            pending_milestone = Milestone.objects.filter(
-                project=project,
-                status='Pending',
-                payment_status='Unpaid'
-                ).order_by('order_number').first()
-            
-            if pending_milestone:
-                #store the milestone id session for use in payment view
-                pending_milestone_id = pending_milestone.id
-                break
-    
-    if pending_milestone_id:
-        #get specific milestone to pay
-        try:
-            milestone_to_pay =  Milestone.objects.get(id=pending_milestone_id)
-            project = milestone_to_pay.project
-
-            if request.method == 'POST':
-                #process payment
-
-                milestone_to_pay.payment_status = 'Paid'
-                milestone_to_pay.status = 'Active'
-                milestone_to_pay.save()
-
-                #clear the session variable
-                if 'pending_milestone_id' in request.session:
-                    del request.session['pending_milestone_id']
-
-                messages.success(request, f"Payment for milestone '{milestone_to_pay.title} was successfull!'")
-
-                return redirect('home:dashboard')
-            
-            context = {
-                "project":project,
-                "milestone": milestone_to_pay
-            }
-
-        except Milestone.DoesNotExist:
-            messages.error(request, "The milestone youre trying to pay for does not exist")
-            return redirect('home:dashboard')
-
-
-    return render(request, 'home/milestone_payment.html', context)
 
 

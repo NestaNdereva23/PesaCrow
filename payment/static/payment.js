@@ -44,7 +44,7 @@ function pollTransactionStatus(checkoutRequestId) {
                     document.getElementById('payment-status').textContent = 'Payment successful! Redirecting...';
                     // Redirect to dashboard after 2 seconds
                     setTimeout(() => {
-                        window.location.href = '/dashboard/';
+                        window.location.href = '{% url "home:dashboard" %}';
                     }, 2000);
                 } else if (data.payment_status === 'Failed') {
                     clearInterval(statusInterval);

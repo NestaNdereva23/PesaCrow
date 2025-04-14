@@ -10,6 +10,7 @@ from projects.models import ProjectRequest, Milestone
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 from contracts.models import Contract
+from contracts.services import create_contract_from_template
 
 #handle the recepient of the project request view
 @login_required
@@ -55,32 +56,31 @@ def projectrequest(request):
     user = request.user
     if user.userprofile.role_type == 'Developer':
         return developers_projects(request)
+    
     elif user.userprofile.role_type == 'Client':
+        form = ProjectRequestForm(data=request.POST or None)
 
-        form = ProjectRequestForm(data=request.POST)
-
-        #handle clients project request form
         if request.method == "POST":
             if form.is_valid():
                 project_request = form.save(commit=False)
+                project_request.sender_email = user.email
                 project_request.user = request.user
                 project_request.save()
 
-                #Send email notification to recipient
+                # Send email notification to recipient
                 subject = f'New project request: {project_request.title}'
                 message = f'''
-    
                 Hello,
-    
+
                 You have received a new project request from {request.user.username}.
-    
+
                 Project Details:
                 Title: {project_request.title}
                 Description: {project_request.project_description}
                 Budget: Ksh. {project_request.budget}
-    
+
                 Please login to your dashboard to view more details and respond.
-    
+
                 Best regards,
                 PesaCrow Team
                 '''
@@ -93,34 +93,29 @@ def projectrequest(request):
                     fail_silently=False,
                 )
 
-                #handle success message
                 messages.success(request, "Project request sent successfully!")
-
                 return redirect(reverse("home:dashboard"))
             else:
                 print(form.errors)
                 messages.error(request, "Project request not sent")
                 return redirect(reverse('projects:projectrequest'))
         else:
-            form= ProjectRequestForm(instance=user)
+            form = ProjectRequestForm()
 
-        #filter sent project request
-        client_project = get_object_or_404(ProjectRequest, sender_email=request.user.email)
-        project = ProjectRequest.objects.filter(id=client_project.id)
+        # Filter sent project request
+        client_project = ProjectRequest.objects.filter(sender_email=request.user.email).first()
+        project = ProjectRequest.objects.filter(id=client_project.id) if client_project else None
 
-        # handle projects for client and developer differently
+        # Handle projects for client and developer differently
+        client_projectrequests = ProjectRequest.objects.filter(sender_email=user.email) if user.email else None
 
-        if client_project.sender_email == user.email:
-            client_projectrequests = ProjectRequest.objects.filter(sender_email=user.email)
+        context = {
+            "form": form,
+            "project": project,
+            "client_projectrequests": client_projectrequests,
+        }
 
-            context = {
-                "form":form,
-                "project": project,
-                "client_projectrequests": client_projectrequests,
-            }
-
-            return render(request, "projects/projectrequest.html", context)
-
+        return render(request, "projects/projectrequest.html", context)
 
 
 def create_milestones(request, project_id):
@@ -149,12 +144,14 @@ def create_milestones(request, project_id):
             milestone.save()
 
             #return only the new html for htmx to insert
+            
             return render(request, "projects/partials/milestone_item.html", {"milestones":milestones})
         else:
             return render(request, "projects/partials/milestone_form.html", {
                 "form": form,
                 "project": project
             })
+    
 
     #display milestone_form via htmx
     if request.headers.get('HX-Request') and request.GET.get('action') == 'new_form':
@@ -163,6 +160,7 @@ def create_milestones(request, project_id):
             "form": form,
             "project": project
         })
+
 
     #notify client contract is finished
     if request.method == 'POST' and "verify_milestones" in request.POST and project.verified == False:
@@ -179,8 +177,6 @@ def create_milestones(request, project_id):
             fail_silently=False,
         )
         return redirect(reverse('home:dashboard'))
-    else:
-        return HttpResponseForbidden("Something went wrong when sending notification")
 
     #default page load
     context = {
@@ -228,7 +224,7 @@ def client_milestone_verification(request, id):
         #approve project verification status
         project.verified = True
         project.save()
-        #send notification email to sender/client
+        #send notification email to the developer for approving the milestones  added to the project
         # send_mail(
         #     subject=f'Milestone Verification for Project: {project.title}',
         #     message=f'''
@@ -245,11 +241,12 @@ def client_milestone_verification(request, id):
         # Check if a contract already exists for this project
         try:
             contract = Contract.objects.get(project=project)
-            # If contract exists, redirect to edit page
+            # If contract exists, redirect to edit contraacts page
             return redirect('contracts:edit_contract', contract_id=contract.id)
         except Contract.DoesNotExist:
             # If no contract exists, create one first
-            from contracts.services import create_contract_from_template
+            from django.core.management import call_command
+            call_command('initialize_contract_templates')    #initialize templates if not already initialized
             contract = create_contract_from_template(project.id)
             return redirect('contracts:edit_contract', contract_id=contract.id)
 

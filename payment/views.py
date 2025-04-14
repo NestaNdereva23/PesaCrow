@@ -102,18 +102,18 @@ def milestone_payment(request):
                             'checkout_request_id': mpesa_response.get('CheckoutRequestID'),
                         })
                     else:
-                        # milestone_to_pay.payment_status = 'Unpaid'
-                        # milestone_to_pay.status = 'Pending'
-                        # milestone_to_pay.save()
+                        milestone_to_pay.payment_status = 'Unpaid'
+                        milestone_to_pay.status = 'Pending'
+                        milestone_to_pay.save()
                         return JsonResponse({
                             'status': 'error',
                             'message': 'Mpesa payment failed',
                         })
                 except Exception as e:
                     logger.error(f"Error initating Mpesa STKS Push: {str(e)}")
-                    # milestone_to_pay.payment_status = 'Unpaid'
-                    # milestone_to_pay.status = 'Pending'
-                    # milestone_to_pay.save()
+                    milestone_to_pay.payment_status = 'Unpaid'
+                    milestone_to_pay.status = 'Pending'
+                    milestone_to_pay.save()
                     return JsonResponse({
                         'status': 'error',
                         'message': 'An error has occurred. Please try again.',

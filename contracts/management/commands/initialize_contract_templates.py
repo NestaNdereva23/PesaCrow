@@ -116,7 +116,25 @@ the Client.
 software) that have their licensing terms will remain under those terms and may
 not transfer to the Client upon project completion."""
             },
-            # Continue with all the other sections from your template
+            {
+                'name':'Client Responsibilities',
+                'section_key':'client_responsibilities',
+                'content':"""Client Responsibilities:
+● Provision of Materials:
+    ○ The Client agrees to provide all necessary materials (such as content, logos,
+    branding guidelines, and other relevant documents) in a timely manner to aid the
+    development process
+● Feedback and Approvals:
+    ○ The Client commits to providing feedback, revisions, and approvals within
+[Specify Number of Days, e.g., "5 business days"] of receiving requests from the
+Developer. Delays may result in project timeline extensions.
+● Access:
+    ○ The Client will grant the Developer access to necessary platforms, servers, or
+software when required for the completion of tasks.
+●  Point of Contact:    
+    ○ The Client will designate a primary point of contact who will communicate with
+the Developer, ensuring consistency and clarity in feedback and decisions. """
+            },
         ]
 
         created_count = 0

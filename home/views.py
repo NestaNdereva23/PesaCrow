@@ -19,17 +19,6 @@ from django.db.models import Count
 def homepage(request):
     return render(request, 'home/homepage.html')
 
-# def registration(request):
-#     form = RegistrationForm(request.POST or None)
-
-#     if request.method == "POST":
-#         form = RegistrationForm(request.POST or None)
-#         if form.is_valid():
-#             form.save()
-#             # user = form.cleaned_data.get('email')
-#             return reverse('login')
-
-#     return render(request, 'registration/registration.html', {'form': form})
 
 class RegistrationView(FormView):
     template_name = 'registration/registration.html'
@@ -49,9 +38,6 @@ class RegistrationView(FormView):
                 return redirect(self.success_url)
             
         return render(request, self.template_name, {'form': form})
-
-
-
 
 
 def login_page(request):

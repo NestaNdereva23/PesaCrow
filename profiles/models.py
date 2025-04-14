@@ -8,7 +8,7 @@ ROLE_TYPES = [
 ]
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="userprofile")
     role_type = models.CharField(max_length=255, choices=ROLE_TYPES, default="CLIENT")
     phone_number = models.CharField(max_length=11, unique=True)
     mpesa_number = models.CharField(max_length=11, unique=True)

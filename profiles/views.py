@@ -13,6 +13,7 @@ from profiles.forms import ProfileUpdateForm, ContactUpdateForm
 def profiles(request):
     user = request.user
     user_check = User.objects.get(username=request.user)
+
     if user_check.first_name == "" and user_check.last_name == "":
         messages.warning(request, "Update your profile")
 

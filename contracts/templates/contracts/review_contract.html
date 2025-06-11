@@ -1,6 +1,9 @@
 {% load static %} {% include "sidebar.html" %} {% block content %}
 
 <div class="p-4 sm:ml-64">
+{% for msg in messages %}
+            <p>{{ msg }}</p>
+        {% endfor %}
   <p class="text-2xl m-2 font-semibold tracking-tight leading-none text-black">
       Review Contract
   </p>

@@ -16,11 +16,31 @@ from contracts.services import create_contract_from_template
 @login_required
 def developers_projects(request):
     user = request.user
-    project_requests = ProjectRequest.objects.filter(receiver_email=request.user.email)
-    # print(ProjectRequest.objects.filter(receiver_email=request.user.email).query)
-    
+    project_requests = ProjectRequest.objects.filter(receiver_email=user.email)
+
+    project_progress = []
+
+    for project in project_requests:
+        milestones = Milestone.objects.filter(project=project)
+        completed_milestones = Milestone.objects.filter(project=project, status="Completed").count()
+        total_milestones = Milestone.objects.filter(project=project).count()
+
+        if total_milestones > 0:
+            milestone_percentage = (completed_milestones / total_milestones ) *  100
+        else:
+            milestone_percentage = 0
+
+        project_progress.append({
+            'project': project,
+            'milestones': milestones,
+            'completed_milestones':completed_milestones,
+            'total_milestones':total_milestones,
+            'milestone_percentage':milestone_percentage
+        })
+    # print(Milestone.objects.filter(project_requests, status="completed").query)
+    print(project_progress)
     context = {
-        "project_requests":project_requests,
+        'project_progress':project_progress
     }
     return render(request, "projects/developers_projects.html", context)
 
@@ -107,17 +127,37 @@ def projectrequest(request):
         project = ProjectRequest.objects.filter(id=client_project.id) if client_project else None
 
         # Handle projects for client and developer differently
-        client_projectrequests = ProjectRequest.objects.filter(sender_email=user.email) if user.email else None
+        project_requests = ProjectRequest.objects.filter(sender_email=user.email)
 
+        project_progress = []
+
+        for project in project_requests:
+            milestones = Milestone.objects.filter(project=project)
+            completed_milestones = Milestone.objects.filter(project=project, status="Completed").count()
+            total_milestones = Milestone.objects.filter(project=project).count()
+
+            if total_milestones > 0:
+                milestone_percentage = (completed_milestones / total_milestones) * 100
+            else:
+                milestone_percentage = 0
+
+            project_progress.append({
+                'project': project,
+                'milestones': milestones,
+                'completed_milestones': completed_milestones,
+                'total_milestones': total_milestones,
+                'milestone_percentage': milestone_percentage
+            })
+        print(project_progress)
         context = {
             "form": form,
             "project": project,
-            "client_projectrequests": client_projectrequests,
+            'project_progress': project_progress
         }
 
         return render(request, "projects/projectrequest.html", context)
 
-
+""" Allows the developer to create milestones after they have accepted the project request from the client"""
 def create_milestones(request, project_id):
     user = request.user
     project = get_object_or_404(ProjectRequest, id=project_id)
@@ -162,21 +202,22 @@ def create_milestones(request, project_id):
         })
 
 
-    #notify client contract is finished
-    if request.method == 'POST' and "verify_milestones" in request.POST and project.verified == False:
-        #send notification email to sender/client
-        send_mail(
-            subject=f'Milestone Verification for Project: {project.title}',
-            message=f'''
-            Hello, the developer {request.user.email} has added milestones to '{project.title}'.\n
-            Visit your project dashboard to verify that the milestones align within your scope.\n
-            .If it aligns click on approve button to generate a contract else communicate with the developer until every milestone aligns.
-            ''',
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[project.sender_email],
-            fail_silently=False,
-        )
-        return redirect(reverse('home:dashboard'))
+    #notify client the milestones are done 
+    if request.method == 'POST' and "verify_milestones" in request.POST:
+        if not project.verified:
+            #send notification email to sender/client after the developer has finished creating the milestones
+            send_mail(
+                subject=f'Milestone Verification for Project: {project.title}',
+                message=f'''
+                Hello, the developer {request.user.email} has added milestones to '{project.title}'.\n
+                Visit your project dashboard to verify that the milestones align within your scope.\n
+                .If it aligns click on approve button to generate a contract else communicate with the developer until every milestone aligns.
+                ''',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[project.sender_email],
+                fail_silently=False,
+            )
+            return redirect(reverse('home:dashboard'))
 
     #default page load
     context = {
@@ -188,7 +229,7 @@ def create_milestones(request, project_id):
     }
     return render(request, "projects/milestones.html", context)
 
-
+# developers edit the milestones 
 def edit_milestone(request, milestone_id):
     milestone = get_object_or_404(Milestone, id=milestone_id)
     project=milestone.project
@@ -208,7 +249,7 @@ def edit_milestone(request, milestone_id):
     return render(request, "projects/partials/edit_milestone_form.html", {"form": form, "milestone": milestone})
 
 
-#allows client to view and approve milestones added/update  by developer
+""" allows client to view and approve milestones added/updated  by developer """
 def client_milestone_verification(request, id):
     user = request.user
     project = get_object_or_404(ProjectRequest, id=id)
@@ -220,54 +261,63 @@ def client_milestone_verification(request, id):
     if project.sender_email != user.email:
         return HttpResponseForbidden("You don't have permission to view these milestones")
 
-    if request.method == 'POST' and "approve_milestones" in request.POST and project.verified == False:
-        #approve project verification status
-        project.verified = True
-        project.save()
-        #send notification email to the developer for approving the milestones  added to the project
-        # send_mail(
-        #     subject=f'Milestone Verification for Project: {project.title}',
-        #     message=f'''
-        #             Hello, the client {project.sender_email} approved '{project.title}' and the added milestones.\n
-        #             Everything seems fine. Check you contracts section to proceed.\n
-        #
-        #             Best regards,\n
-        #             PesaCrow Team :)
-        #             ''',
-        #     from_email=settings.DEFAULT_FROM_EMAIL,
-        #     recipient_list=[project.receiver_email],
-        #     fail_silently=False,
-        # )
-        # Check if a contract already exists for this project
-        try:
-            contract = Contract.objects.get(project=project)
-            # If contract exists, redirect to edit contraacts page
-            return redirect('contracts:edit_contract', contract_id=contract.id)
-        except Contract.DoesNotExist:
-            # If no contract exists, create one first
-            from django.core.management import call_command
-            call_command('initialize_contract_templates')    #initialize templates if not already initialized
-            contract = create_contract_from_template(project.id)
-            return redirect('contracts:edit_contract', contract_id=contract.id)
+    if request.method == 'POST' and "approve_milestones" in request.POST:
+        if not project.verified: #check to ensure project is not verified , if it is verified ot has already been approved
+        
+            project.verified = True    # approve project verification status
+            project.save()
+            #send notification email to the developer for approving the milestones  added to the project
+            # send_mail(
+            #     subject=f'Milestone Verification for Project: {project.title}',
+            #     message=f'''
+            #             Hello, the client {project.sender_email} approved '{project.title}' and the added milestones.\n
+            #             Everything seems fine. Check you contracts section to proceed.\n
+            #
+            #             Best regards,\n
+            #             PesaCrow Team :)
+            #             ''',
+            #     from_email=settings.DEFAULT_FROM_EMAIL,
+            #     recipient_list=[project.receiver_email],
+            #     fail_silently=False,
+            # )
+            # Check if a contract already exists for this project
+            try:
+                contract = Contract.objects.get(project=project)
+                # If contract exists, redirect to edit contraacts page
+                return redirect('contracts:edit_contract', contract_id=contract.id)
+            except Contract.DoesNotExist:
+                # If no contract exists, create one first
+                from django.core.management import call_command
+                call_command('initialize_contract_templates')    #initialize templates if not already initialized
+                contract = create_contract_from_template(project.id)
+                return redirect('contracts:edit_contract', contract_id=contract.id)
+        else:
+             #TODO  check the project status
+             project_status = project.status
+             messages.info(request, f"{project_status}")
 
-    elif  request.method == 'POST' and "disapprove_milestones" in request.POST and project.verified == False:
-        send_mail(
-            subject=f'Milestone Verification for Project: {project.title}',
-            message=f'''
-                            Hello, the client {project.sender_email} disapproved some sections of the milestones.\n
-                            Consult with the client to address the issues.\n
 
-                            Best regards,\n
-                            PesaCrow Team :)
-                            ''',
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[project.receiver_email],
-            fail_silently=False,
-        )
-        return redirect(reverse('home:dashboard'))
+    elif  request.method == 'POST' and "disapprove_milestones" in request.POST:
+        if not project.verified:
+            send_mail(
+                subject=f'Milestone Verification for Project: {project.title}',
+                message=f'''
+                                Hello, the client {project.sender_email} disapproved some sections of the milestones.\n
+                                Consult with the client to address the issues.\n
 
-    # If we get here, user is authorized to see the milestones
+                                Best regards,\n
+                                PesaCrow Team :)
+                                ''',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[project.receiver_email],
+                fail_silently=False,
+            )
+            return redirect(reverse('home:dashboard'))
+
+    # user is authorized to see the milestones
     return render(request, "projects/client_milestones.html", {
         "project": project,
         "milestones": milestones
     })
+
+

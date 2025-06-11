@@ -73,7 +73,8 @@ def edit_contract(request, contract_id):
         if formset.is_valid():
             formset.save()
             messages.success(request, "Contract update successfully")
-            # return redirect(reverse('contracts:review_contract'), contract_id=contract.id)
+            print("workinggggggggggggggggggg")
+            return redirect(reverse('contracts:review_contract'), contract_id=contract.id)
         else:
             print(formset.errors)
 

@@ -1,16 +1,40 @@
 from django.contrib import messages
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-
+from django.contrib.auth.decorators import login_required
 from payment.mpesa_client import MpesaClient
 from projects.models import ProjectRequest, Milestone
 import logging
 from .models import MilestonePayment
 import json
+from django.db import IntegrityError
+from django.views.decorators.csrf import csrf_exempt
 logger = logging.getLogger(__name__)
 
 
+''' Handles the payment view when a client clicks on the payment button from the projects view'''
+@login_required
+def pay_milestone(request, milestone_id):
+    milestone = get_object_or_404(Milestone, id=milestone_id)
+
+    # Ensure only the project client can pay
+    if request.user.email != milestone.project.sender_email:
+        messages.error(request, "You don't have permission to pay for this milestone.")
+        return redirect('projects:dashboard')
+
+    # Ensure milestone is in pending status
+    if milestone.status != 'Pending':
+        messages.error(request, "This milestone is not available for payment.")
+        return redirect('projects:project_detail', milestone.project.id)
+
+    context = {
+        'milestone': milestone,
+    }
+    return render(request, 'payment/milestone_payment.html', context)
+
+
+#TODO Refactor and remove the session implementation
 def milestone_payment(request):
     user = request.user
     if user.userprofile.role_type != 'Client':
@@ -21,118 +45,139 @@ def milestone_payment(request):
         messages.error(request, "Please add your Mpesa number in your profile before making payments.")
         return redirect(reverse("profiles:profile"))
 
-    project_requests = ProjectRequest.objects.filter(sender_email=request.user.email, verified=True)
-    context = {}
-    # get the pending milestone id from session
-    pending_milestone_id = request.session.get('pending_milestone_id')
-    if not pending_milestone_id:
-        # if no pending milestone id in session find one
-        projects = ProjectRequest.objects.filter(sender_email=request.user.email, verified=True)
-        for project in projects:
-            # check for pending miestone
-            pending_milestone = Milestone.objects.filter(
-                project=project,
-                status='Pending',
-                payment_status='Unpaid'
-            ).order_by('order_number').first()
-
-            if pending_milestone:
-                # store the milestone id session for use in payment view
-                pending_milestone_id = pending_milestone.id
-                break
-
-    if pending_milestone_id:
+    if request.method == 'POST':
+        #GET milestone id from form data
+        milestone_id = request.POST.get('milestone_id')
+        if not milestone_id:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Milestone ID is required'
+            })
         # get specific milestone to pay
         try:
-            milestone_to_pay = Milestone.objects.get(id=pending_milestone_id)
-            project = milestone_to_pay.project
+            # milestone_to_pay = Milestone.objects.get(id=milestone_id)
+            milestone_to_pay = get_object_or_404(Milestone, id=milestone_id)
+            
+            #verify user permissions
+            if request.user.email != milestone_to_pay.project.sender_email:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': "you do not have permission to pay for this milestone"
+                })
+            
+            #Ensure the milstone has the correct status payment i.e Pending
+            if milestone_to_pay.payment_status not in ['Unpaid', 'Failed', 'Processing']:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': "This milestone is not available for payment"
+                })
+            
+            #check if there already a pending payment
+            existing_payment  = MilestonePayment.objects.filter(
+                milestone=milestone_to_pay,
+                status__in='Pending'
+            ).first()
 
-            if request.method == 'POST':
-                '''
-                    Process payment
-                '''
+            if existing_payment:
+                return JsonResponse({
+                    'status': 'success',
+                    'message': 'Payment already in progress. Check your phone to complete the payment.',
+                    'milestone': milestone_to_pay.id,
+                    'checkout_request_id': existing_payment.checkout_request_id,
+                })
                 
-                mpesa_client = MpesaClient()
-                #get specific milestone to pay
+            mpesa_client = MpesaClient()
+            
+                #clean and get mpesa number
+            mpesa_number = clean_mpesa_no(request)
+            if not mpesa_number:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': "Invalid Mpesa Number format"
+                })
+                    
+            ''' Initiate the STK Push'''
+            mpesa_response = mpesa_client.initiate_stk_push(
+            mpesa_number,
+            int(milestone_to_pay.payment_amount),
+            )
+            logger.info(f"Mpesa Response: {mpesa_response}")
+                
+            if mpesa_response and mpesa_response.get('ResponseCode') == '0':
+                #create payment record
+                logger.info(f"Mpesa Response full content: {mpesa_response}")
+                print(mpesa_response) 
+
                 try:
-                    #clean and get mpesa number
-                    
-                    mpesa_number = clean_mpesa_no(request)
-                    print(mpesa_number)
-                    if not mpesa_number:
-                        messages.error(request, "Invalid Mpesa Number format")
-                        context = {"project": project, "milestone": milestone_to_pay}
-                        return render(request, "payment/milestone_payment.html", context)
-
-                    mpesa_response = mpesa_client.initiate_stk_push(
-                    clean_mpesa_no(request),
-                    int(milestone_to_pay.payment_amount),
+                    transaction = MilestonePayment.objects.create(
+                        milestone=milestone_to_pay,
+                        amount=int(milestone_to_pay.payment_amount),
+                        checkout_request_id=mpesa_response.get('CheckoutRequestID'),
+                        status= 'Pending',
+                        mpesa_number=mpesa_number,
+                        description=f"Payment for milestone: {milestone_to_pay.title}"
                     )
-                    logger.info(f"Mpesa Response: {mpesa_response}")
-                    
-                    if mpesa_response and mpesa_response.get('ResponseCode') == '0':
-                        #create payment record
-                        logger.info(f"Mpesa Response full content: {mpesa_response}")
-                        print(mpesa_response)
-
+                        # Update the milestone status
+                    milestone_to_pay.payment_status = 'Processing'
+                    milestone_to_pay.save()
                         
- 
-                        transaction = MilestonePayment.objects.create(
-                            milestone=milestone_to_pay,
-                            amount=int(milestone_to_pay.payment_amount),
-                            checkout_request_id=mpesa_response.get('CheckoutRequestID'),
-                            status= 'Pending',
-                            mpesa_number=mpesa_number,
-                            description=f"Payment for milestone: {milestone_to_pay.title}"
-                        )
-                        # transaction.save()
-                        milestone_to_pay.payment_status = 'Processing'
-                        milestone_to_pay.save()
-                        
-                        # clear the session variable
-                        if 'pending_milestone_id' in request.session:
-                            del request.session['pending_milestone_id']
-
-                        messages.success(request, f"Payment for milestone '{milestone_to_pay.title} was successfull!'")
+                    messages.success(request, 
+                        f"Payment for milestone '{milestone_to_pay.title} was initiated successfully!'")
                         # return redirect('home:dashboard')
+                    return JsonResponse({
+                        'status': 'success',
+                        'message': 'Check your phone to complete the payment',
+                        'milestone': milestone_to_pay.id,
+                        'checkout_request_id': mpesa_response.get('CheckoutRequestID'),
+                    })
+                except IntegrityError as e:
+                    # Handle duplicate payment record
+                    logger.error(f"Duplicate payment record attempt: {str(e)}")
+                    
+                    # Check if payment record was created by another request
+                    existing_payment = MilestonePayment.objects.filter(
+                        milestone=milestone_to_pay,
+                        checkout_request_id=mpesa_response.get('CheckoutRequestID')
+                    ).first()
+                    
+                    if existing_payment:
                         return JsonResponse({
-                            'status': 'Success',
-                            'message': 'Check your phone to complete the payment',
+                            'status': 'success',
+                            'message': 'Payment already initiated. Check your phone to complete the payment.',
                             'milestone': milestone_to_pay.id,
-                            'checkout_request_id': mpesa_response.get('CheckoutRequestID'),
+                            'checkout_request_id': existing_payment.checkout_request_id,
                         })
                     else:
-                        milestone_to_pay.payment_status = 'Unpaid'
-                        milestone_to_pay.status = 'Pending'
-                        milestone_to_pay.save()
                         return JsonResponse({
                             'status': 'error',
-                            'message': 'Mpesa payment failed',
+                            'message': 'Payment record creation failed. Please try again.',
                         })
-                except Exception as e:
-                    logger.error(f"Error initating Mpesa STKS Push: {str(e)}")
-                    milestone_to_pay.payment_status = 'Unpaid'
-                    milestone_to_pay.status = 'Pending'
-                    milestone_to_pay.save()
-                    return JsonResponse({
-                        'status': 'error',
-                        'message': 'An error has occurred. Please try again.',
-                    })
 
-            context = {
-                "project": project,
-                "milestone": milestone_to_pay
-            }
+            else:
+                # milestone_to_pay.payment_status = 'Unpaid'
+                # milestone_to_pay.status = 'Pending'
+                # milestone_to_pay.save()
 
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Mpesa payment failed. Please try again',
+                })
         except Milestone.DoesNotExist:
-            messages.error(request, "The milestone youre trying to pay for does not exist")
-            return redirect('home:dashboard')
+            return JsonResponse({
+                'status': 'error',
+                'message': 'The milestone youre trying to pay for does not exist.',
+            })
+
+        except Exception as e:
+            logger.error(f"Error initating Mpesa STK Push: {str(e)}")
+            return JsonResponse({
+                    'status': 'error',
+                    'message': "An error has occurred. Please try again"
+                })
     else:
         #no pending milestones to pay
         messages.info(request, "No pending milestones require payment at this time")
         return redirect('home:dashboard')
-
-    return render(request, 'payment/milestone_payment.html', context)
 
 def clean_mpesa_no(request):
     user = request.user
@@ -197,10 +242,9 @@ def check_transaction_status(request):
 
     return JsonResponse({'status': 'error', 'message': 'Method not allowed' }, status=405)
 
+@csrf_exempt
 def mpesa_callback(request):
-    '''
-    Handle Mpesa payment callback
-    '''
+    ''' Handle Mpesa payment callback '''
     if request.method == 'POST':
         try:
             callback_data = json.loads(request.body)
@@ -217,13 +261,15 @@ def mpesa_callback(request):
                     receipt_number = item.get('Value')
 
             #retrieve transaction
-            transaction = MilestonePayment.objects.filter(checkout_request_id=checkout_request_id).order_by('order_number').first()
+            transaction = MilestonePayment.objects.filter(checkout_request_id=checkout_request_id).first()
+            print(transaction)
             if not transaction:
                 logger.error(f"Transaction with Checkout Request ID '{checkout_request_id}' not found.")
                 return JsonResponse({"ResultCode": result_code, "ResultDesc": "Transaction not found"})
 
             #update transaction and milestone
             if result_code == 0:
+                print(result_code)
                 transaction.status = 'Complete'
                 transaction.receipt_no = receipt_number
                 transaction.save()
@@ -252,4 +298,14 @@ def mpesa_callback(request):
             return JsonResponse({"ResultCode": 1, "ResultDesc": "Internal Server Error"}, status=500)
 
     return JsonResponse({"ResultCode":1, "ResultDesc":"Invalid Request"}, status=400)
+
+
+
+
+
+def payment_success(request, milestone_id):
+    milestone = get_object_or_404(Milestone, id=milestone_id)
+    return render(request, 'projects/payment_success.html', {'milestone': milestone})
+
+
 

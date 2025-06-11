@@ -2,11 +2,13 @@ document.addEventListener("DOMContentLoaded", function () {
   const modalBackdrop = document.querySelector("[data-dialog-backdrop='edit-milestone-modal']");
   const modalContainer = document.querySelector("[data-dialog='edit-milestone-modal']");
   
+
   // Function to open modal
   window.openMilestoneModal = function() {
     modalBackdrop.classList.remove("pointer-events-none", "opacity-0");
     modalBackdrop.classList.add("opacity-100", "pointer-events-auto");
   };
+
   
   // Function to close modal
   window.closeMilestoneModal = function() {

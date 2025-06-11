@@ -68,7 +68,7 @@
       </div>
       
       <div class="mt-6">
-          <form id="payment-form" method="POST" action="{% url 'payment:milestone_payment' %}" onsubmit="return initiatePayment()">
+          <form id="payment-form" method="POST" action="{% url 'payment:milestone_payment' %}" data-success-url="{% url 'home:dashboard' %}" onsubmit="return initiatePayment()">
             {% csrf_token %}
             <input type="hidden" name="milestone_id" value="{{ milestone.id }}">
 

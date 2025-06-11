@@ -13,6 +13,7 @@ from django.urls import reverse_lazy, reverse
 from .forms import  RegistrationForm
 from projects.models import ProjectRequest,Milestone
 from contracts.models import Contract
+from django.views.generic import TemplateView
 from django.db.models import Count
 
 # Create your views here.
@@ -60,6 +61,31 @@ def login_page(request):
 
 
 #user dashboard view
+class DashboardView(TemplateView):
+    template_name = "home/dashboard.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project = get_object_or_404(ProjectRequest)
+        dashboard_active_projects = ProjectRequest.objects.filter(
+            status='Active')
+        no_of_milestones = Milestone.objects.filter(project=project).count()
+        
+        context = {
+            'active_projects': dashboard_active_projects,
+            'no_of_milestones': no_of_milestones,
+        }
+        print(context)
+        return context
+
+    '''
+        TODO Escrow Account display
+        Total Escrow Amount $$$, Project Name: Milestone: Milestone Amount
+        The displayed amount is already the one deposited by client and held in the escrow account(PesaCrow bank/mpesa account)**
+        ---Escrow Account (model)
+        
+    '''
+
 @login_required
 def dashboard(request):
 
@@ -78,12 +104,12 @@ def dashboard(request):
             payment_needed = False
             for project in project_requests:
                     #checkif contract is verified i.e approved by the client after allmilestones have been added
-                    if project.verified == True:
+                    if project.verified:
 
                         #check if there is a contract associated with the active project to avoid null error is none exists   
                         if hasattr(project, 'contract') and project.contract is not None:
                                 
-                            if project.contract.signed_by_client == True and project.contract.signed_by_developer == True:
+                            if project.contract.signed_by_client and project.contract.signed_by_developer:
                                 #check for pending miestone
                                 pending_milestone = Milestone.objects.filter(
                                     project=project,
@@ -145,4 +171,24 @@ def logoutPage(request):
     logout(request)
     return redirect(reverse('home:home'))
 
+'''
+    TODO Dashboard active projects 
+    should display projectname, no of milestones, budget
+'''
+def active_projects(request):
+    #filter active projects
+    active_projects = ProjectRequest.objects.all()
 
+    
+    context = {
+
+    }
+    return render(request, 'home/dashboard.html', context)
+
+'''
+    TODO Escrow Account display
+    Total Escrow Amount $$$, Project Name: Milestone: Milestone Amount
+
+'''
+def escrow_account(request):
+    pass

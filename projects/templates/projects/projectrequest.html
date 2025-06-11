@@ -1,157 +1,255 @@
 {% load static %} {% include "sidebar.html" %} {% block content %}
+<script src="{% static 'createproject.js' %}"></script>
 
 <div class="p-4 sm:ml-64">
   <p class="text-2xl m-2 font-semibold tracking-tight leading-none text-black">
     Projects
   </p>
-  {{user.username}}
   <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
 
   {% if messages %} {% for m in messages %}
   <p>{{m}}</p>
   {% endfor %} {% endif %}
 
-  <div class="flex flex-wrap h-60 mt-10">
-    <div class="w-1/2 md:">
-      <div
-        class="w-full m-2 max-w-lg p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8 dark:bg-customBlue dark:border-gray-700"
-      >
-        <form method="post" class="w-sm space-y-4 md:space-y-6">
-          {% csrf_token %}
-          <div class="flex items-center justify-center m-0 p-0">
-            <p class="m-2 text-lg">Create a project request</p>
+
+  <!-- TODO move the project creation form to a modal for better UI -->
+   <div class="flex flex-auto">
+
+    <button class="rounded-md mb-2 mr-3 bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all ">
+      Active Projects
+    </button>
+    <button
+            data-dialog-target="create-project-modal"
+            class="rounded-md mb-2 mr-3 bg-blue-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
+            type="button"
+          >
+            Create Project
+    </button>
+    <button
+            data-dialog-target="create-project-modal"
+            class="rounded-md mb-2 mr-3 bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
+            type="button"
+          >
+            Review Deliverables
+    </button>
+   </div>
+{% if project_progress %}
+    {% for item in project_progress %}
+<div class="w-full p-2 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-customBlue dark:border-gray-700">
+  <!-- Project Header -->
+  <div class="text-center mb-2">
+    <h5 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+      {{ item.project.title }}
+    </h5>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+      <p class="text-left text-gray-600 dark:text-gray-300">
+        <span class="font-medium">Client:</span> {{item.project.sender_email}}
+      </p>
+      <p class="text-left text-gray-600 dark:text-gray-300">
+        <span class="font-medium">Created:</span> {{ item.project.created_at|date:"M d, Y" }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Project Details -->
+  <div class="mb-2">
+    <div class="flex flex-wrap gap-4 text-sm">
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+        Status: {{ item.project.status}}
+      </span>
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+        Budget: Ksh. {{ item.project.budget }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Compact Milestones Section -->
+  <div class="mb-6">
+    <h6 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">Milestones</h6>
+<div class="space-y-2">
+  {% for milestone in item.milestones %}
+  <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+    <!-- Milestone Icon -->
+    <div class="flex-shrink-0">
+      {% if milestone.status == 'Completed' %}
+        <div class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+          ✓
+        </div>
+      {% elif milestone.status == 'Pending' %}
+        <div class="w-8 h-8 bg-yellow-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+          ⏳
+        </div>
+      {% else %}
+        <div class="w-8 h-8 bg-gray-400 text-white rounded-full flex items-center justify-center text-sm font-bold">
+          ○
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Milestone Content -->
+    <div class="flex-grow min-w-0">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div class="flex-grow">
+          <h4 class="font-medium text-gray-900 dark:text-white text-sm">
+            {{ milestone.title }}
+          </h4>
+          <div class="flex items-center gap-2 text-xs mt-1">
+            <span class="px-2 py-1 {% if milestone.status == 'Completed' %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200{% elif milestone.status == 'Pending' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200{% else %}bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200{% endif %} rounded-full">
+              {{ milestone.status }}
+            </span>
+            <span class="font-medium text-gray-600 dark:text-gray-300">
+              Ksh. {{ milestone.payment_amount }}
+            </span>
           </div>
-          <div>
+        </div>
+
+        <!-- Payment Button for Clients -->
+        {% if user.userprofile.role_type == 'Client' and milestone.status == 'Pending' %}
+        <div class="flex-shrink-0">
+          <a href="{% url 'payment:pay_milestone' milestone.id %}"
+             class="inline-flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
+            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+            </svg>
+            Pay Now
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{#    action button#}
+    <div>
+      <form action="{% url 'projects:client_verify_milestone' item.project.id %}" method="get">
+      <button type="submit"
+      class="h-11 w-48 mt-7 p-2 text-white bg-gray-900 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+      >
+          view milestones
+      </button>
+          </form>
+  </div>
+  {% endfor %}
+
+{% else %}
+<div class="text-center py-12">
+  <div class="text-gray-500 dark:text-gray-400 mb-4">
+    <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  </div>
+  <p class="text-lg font-medium text-gray-600 dark:text-gray-400">No project requests found.</p>
+  <p class="text-sm text-gray-500 dark:text-gray-500 mt-1">Your projects will appear here once you receive them.</p>
+</div>
+{% endif %}
+
+
+  <!-- client create project form modal  -->
+  <div
+  data-dialog-backdrop="create-project-modal"
+  data-dialog-backdrop-close="true"
+  class="pointer-events-none fixed inset-0 z-[999] grid h-screen w-screen place-items-center bg-black bg-opacity-60 opacity-0 backdrop-blur-sm transition-opacity duration-300 max-h-full"
+  >
+    <div
+      data-dialog="create-project-modal"
+      class="relative p-4 w-full max-w-md max-h-full"
+          >
+      <div class="relative p-4 w-full max-w-md max-h-full">
+        <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+        <div
+          class="relative m-2.5 items-center flex justify-center text-white h-24 rounded-md bg-slate-800"
+        >
+          <h3 class="text-2xl">Create Project</h3>
+        </div>
+        <form method="post" class="p-4 md:p-5">
+          {% csrf_token %}
+          <div class="grid gap-4 mb-4 grid-cols-2">
+          <div class="col-span-2">
             <label for="title" class="block mb-2 text-sm font-medium text-white"
               >Project Title</label
             >
-            <!-- <input
+            <input
               type="text"
               name="title"
               id="title"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
               placeholder=""
-            /> -->
-            {{form.title}}
+            />
+            <!-- {{form.title}} -->
           </div>
-          <div>
+          <div class="col-span-2">
             <label
               for="project_description"
               class="block mb-2 text-sm font-medium text-white"
               >Project Description</label
             >
-            <!-- <input
+            <input
               type="text"
               name="project_description"
               id="project_description"
               class="bg-gray-50 border h-28 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
               placeholder="project Description"
-            /> -->
-            {{form.project_description}}
+            />
+            <!-- {{form.project_description}} -->
           </div>
-          <div>
+          <div class="col-span-2 sm:col-span-1">
             <label
               for="project_budget"
               class="block mb-2 text-sm font-medium text-white"
-              >Project Budget</label
+              >Project Budget (Kshs)</label
             >
-            <!-- <input
+            <input
               type="number"
               name="budget"
               id="budget"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
               placeholder="project budget"
-            /> -->
-            {{form.budget}}
+            />
+            <!-- {{form.budget}} -->
           </div>
-          <div class="flex flex-wrap gap-4">
-            <div>
+          <div class="col-span-2 sm:col-span-1">
+            <label
+              for="project_budget"
+              class="block mb-2 text-sm font-medium text-white"
+              >Project Deadline</label
+            >
+            <input
+              type="date"
+              name="deadline"
+              id="deadline"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+              placeholder="project deadline"
+            />
+            <!-- {{form.budget}} -->
+          </div>
+          <div class="col-span-2">
               <label
                 for="receiver"
                 class="block mb-2 text-sm font-medium text-white"
-                >Recipients Email</label
+                >Developers Email</label
               >
-              <!-- <input
+              <input
                 type="email"
                 name="receiver"
                 id="receiver"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                 placeholder="client/org email"
-              /> -->
-              {{form.receiver_email}}
-            </div>
+              />
+              <!-- {{form.receiver_email}} -->
+          </div>
             <button
               type="submit"
-              class="h-11 w-48 mt-7 p-2 text-white bg-gray-900 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+              class="h-11 w-56 mt-7 p-2 text-white bg-gray-900 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
             >
               Send
             </button>
           </div>
         </form>
       </div>
-    </div>
-
-    <!-- handle project requests -->
-    <!-- {% if client_projectrequests %}  -->
-    {% for request in client_projectrequests %}
-    <div>
-      <p class="m-2">Active projects</p>
-
-      <div
-        class="max-w-lg h-60 p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-customBlue dark:border-gray-700"
-      >
-        <a href="#">
-          <h5
-            class="mb-2 text-xl font-bold tracking-tight text-gray-900 dark:text-white"
-          >
-            Project Title: {{request.title}}
-          </h5>
-        </a>
-        <hr class="h-px bg-gray-200 border-0 dark:bg-gray-700" />
-        <div class="flow-root">
-          <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
-            <li class="py-3 sm:py-4">
-              <div class="flex items-center">
-                <div class="shrink-0">
-                  <p>Project Description:</p>
-                </div>
-                <div class="flex-1 min-w-0 ms-4">
-                  <p
-                    class="text-sm font-medium text-gray-900 truncate dark:text-white"
-                  >
-                    {{ request.project_description|truncatechars:50 }}
-                  </p>
-                </div>
-                <div
-                  class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white"
-                >
-                  Budget:Ksh. {{ request.budget }}
-                </div>
-              </div>
-            </li>
-              <div>
-                  receiver: {{ request.receiver_email }}
-              </div>
-              <div>
-                  Status: {{ request.status }}
-              </div>
-              <div>
-                  <form action="{% url 'projects:client_verify_milestone' request.id %}" method="get">
-                  <button type="submit"
-                  class="h-11 w-48 mt-7 p-2 text-white bg-gray-900 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-                  >
-                      view milestones
-                  </button>
-                      </form>
-              </div>
-          </ul>
-
-        </div>
       </div>
     </div>
-    {% endfor %}
-    <!-- {% endif %} -->
   </div>
-</div>
 
 {% endblock %}

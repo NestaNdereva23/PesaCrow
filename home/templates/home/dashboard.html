@@ -6,90 +6,56 @@
   <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
 
   <div class="flex h-60 mt-10">
+
+    <!-- Active projects section -->
     <div class="w-1/2 md:">
-      <p class="m-2">Active milestone</p>
+      <p class="m-2">Active projects</p>
       <div
-        class="w-full m-2 max-w-lg p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8 dark:bg-customBlue dark:border-gray-700"
+        class="m-2 max-w-lg h-64 p-6 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8 dark:bg-customBlue dark:border-gray-700"
       >
-        <div class="flex items-center justify-between mb-1">
-          <h5
-            class="text-sm font-bold leading-none text-gray-900 dark:text-white"
-          >
-            Total: 2
-          </h5>
-          <a
-            href="#"
-            class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-500"
-          >
-            View all
-          </a>
-        </div>
-        <div class="flow-root">
+        <div class="">
           <ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
-              {{ milestones.title }}
-            <li class="py-3 sm:py-4">
+            {% for active in active_projects %}
+            <li class="">
               <div class="flex items-center">
-                <div class="shrink-0">
-                  <img
-                    class="w-8 h-8 rounded-full"
-                    src="/docs/images/people/profile-picture-1.jpg"
-                    alt="Neil image"
-                  />
-                </div>
                 <div class="flex-1 min-w-0 ms-4">
                   <p
-                    class="text-sm font-medium text-gray-900 truncate dark:text-white"
+                    class="text-base font-medium text-gray-900 truncate dark:text-white"
                   >
-                    {{ user.username }}
+                    Project Name: {{ active.title }}
                   </p>
-                  <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                    {{ milestones.estimated_completion }}
+                  <p class="text-base text-gray-100 truncate dark:text-gray-100">
+                    No of Milestones: {{no_of_milestones}}
+                  </p>
+                  <p class="text-base text-gray-100 truncate dark:text-gray-100">
+                    Budget: Ksh. {{ active.budget }}
                   </p>
                 </div>
                 <div
                   class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white"
                 >
-                  Ksh. {{ milestones.payment_amount }}
+                <button
+                class="rounded-md mb-2 mr-3 bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
+                type="button"
+              >
+                View
+              </button>
+                  
                 </div>
               </div>
             </li>
-            <li class="py-3 sm:py-4">
-              <div class="flex items-center">
-                <div class="shrink-0">
-                  <img
-                    class="w-8 h-8 rounded-full"
-                    src="/docs/images/people/profile-picture-1.jpg"
-                    alt="Neil image"
-                  />
-                </div>
-                <div class="flex-1 min-w-0 ms-4">
-                  <p
-                    class="text-sm font-medium text-gray-900 truncate dark:text-white"
-                  >
-                    Zoro ltd
-                  </p>
-                  <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                    Contract period: 1st Feb -- 3rd Aug
-                  </p>
-                </div>
-                <div
-                  class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white"
-                >
-                  Ksh. 15,000
-                </div>
-              </div>
-            </li>
+            <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700" />
+            {% endfor %}
           </ul>
         </div>
       </div>
     </div>
 
     <!-- Escrow account section -->
-    <div class="w-2/5">
+    <div class="w-1/2">
       <p class="m-2">Escrow account</p>
-
       <div
-        class="max-w-lg h-60 p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-customBlue dark:border-gray-700"
+        class="max-w-lg h-64 p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-customBlue dark:border-gray-700"
       >
         <a href="#">
           <h5
@@ -140,27 +106,6 @@
               </div>
             </li>
           </ul>
-        </div>
-      </div>
-    </div>
-
-    <div class="w-2/12 gap-1">
-      <div class="flex flex-col align-middle p-4 mt-8">
-        <div class="mt-4">
-          <button
-            class="rounded-md mb-2 mr-3 bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
-            type="button"
-          >
-            Project Request
-          </button>
-        </div>
-        <div class="mt-8">
-          <button
-            class="rounded-md mb-2 mr-3 bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
-            type="button"
-          >
-            Unread Messages
-          </button>
         </div>
       </div>
     </div>

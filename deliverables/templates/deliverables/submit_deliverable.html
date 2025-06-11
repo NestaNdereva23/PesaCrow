@@ -1,0 +1,156 @@
+{% load static %}
+{% include "sidebar.html" %}
+{% block content %}
+<div class="p-4 sm:ml-64">
+    <p class="text-2xl m-2 font-semibold tracking-tight leading-none text-black">
+        Deliverables
+    </p>
+    <hr class="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700" />
+
+    <!-- Deliverable Submission Form -->
+    <div class="bg-white shadow-lg rounded-lg p-6 mt-2">
+        <form method="post" enctype="multipart/form-data" class="space-y-4">
+            {% csrf_token %}
+
+            <!-- Milestone Section -->
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Milestone:</label>
+                    <span class="text-indigo-600 font-normal">{{ milestone.title }}</span>
+                </div>
+                <div class="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded-full">
+                    In Progress
+                </div>
+            </div>
+
+            <!-- Title -->
+            <div class="space-y-2">
+                <label for="title" class="block text-sm font-medium text-gray-700">
+                    Deliverable Title
+                </label>
+                <input
+                    type="text"
+                    name="title"
+                    id="title"
+                    required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="e.g. Frontend Implementation"
+                />
+            </div>
+
+            <!-- Description -->
+            <div class="space-y-2">
+                <label for="description" class="block text-sm font-medium text-gray-700">
+                    Deliverable Description
+                </label>
+                <textarea 
+                    name="description"
+                    id="description"
+                    rows="4"
+                    required
+                    placeholder="Describe the deliverable..."
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 resize-vertical"
+                ></textarea>
+            </div>
+
+            <!-- Submission Type Selector -->
+            <div class="space-y-2">
+                <label for="submission_type" class="block text-sm font-medium text-gray-700">
+                    Submission Type
+                </label>
+                <select 
+                    name="submission_type" 
+                    id="submission_type" 
+                    onchange="toggleSubmissionFields()" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                    <option value="file">Upload File(s)</option>
+                    <option value="link">External Link</option>
+                </select>
+            </div>
+
+            <!-- File Upload Field -->
+            <div id="fileUploadField" class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">
+                    Upload Files
+                </label>
+                <div 
+                    class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer bg-gray-50 hover:bg-gray-100"
+                    onclick="document.getElementById('fileInput').click()"
+                >
+                    <div class="text-4xl mb-3">📁</div>
+                    <p class="text-gray-700 font-medium mb-1">Click to upload files</p>
+                    <p class="text-gray-500 text-sm">Drag & drop files here or click to browse</p>
+                    <input 
+                        type="file" 
+                        id="fileInput" 
+                        name="files" 
+                        multiple 
+                        class="hidden"
+                    >
+                </div>
+            </div>
+
+            <!-- External Link Field -->
+            <div id="linkField" class="space-y-2 hidden">
+                <label for="submission_link" class="block text-sm font-medium text-gray-700">
+                    Shared Link (e.g. Google Drive, GitHub)
+                </label>
+                <input
+                    type="url"
+                    name="submission_link"
+                    id="submission_link"
+                    placeholder="https://drive.google.com/..."
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                />
+            </div>
+
+            <!-- Additional Notes -->
+            <div class="space-y-2">
+                <label for="reviewer_comments" class="block text-sm font-medium text-gray-700">
+                    Additional Notes
+                </label>
+                <textarea 
+                    name="reviewer_comments"
+                    id="reviewer_comments"
+                    rows="3"
+                    placeholder="Any extra context for the client..."
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 resize-vertical"
+                ></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="pt-4">
+                <button 
+                    type="submit" 
+                    class="w-full bg-indigo-600 text-white py-3 px-4 rounded-md font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+                >
+                    Submit Deliverables
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- JS TO TOGGLE FIELD VISIBILITY -->
+<script>
+    function toggleSubmissionFields() {
+        const type = document.getElementById('submission_type').value;
+        const fileField = document.getElementById('fileUploadField');
+        const linkField = document.getElementById('linkField');
+
+        if (type === 'file') {
+            fileField.classList.remove('hidden');
+            linkField.classList.add('hidden');
+        } else {
+            fileField.classList.add('hidden');
+            linkField.classList.remove('hidden');
+        }
+    }
+
+    // Initialize correct state on page load
+    document.addEventListener("DOMContentLoaded", function () {
+        toggleSubmissionFields();
+    });
+</script>
+{% endblock %}

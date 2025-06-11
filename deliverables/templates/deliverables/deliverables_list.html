@@ -1,0 +1,156 @@
+{% load static %}
+{% include "sidebar.html" %}
+{% block content %}
+<div class="p-4 sm:ml-64">
+    <p class="text-2xl m-2 font-semibold tracking-tight leading-none text-black">
+        Deliverables
+    </p>
+    <hr class="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700" />
+    
+    <!-- Review & Feedback Screen -->
+    <div class="bg-white shadow-lg rounded-lg p-6 mt-4">
+        {%if user.userprofile.role_type == 'Client' %}
+        <form class="space-y-6">
+            <!-- Milestone Section -->
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Milestone:</label>
+                    <span class="text-indigo-600 font-normal">Frontend Development</span>
+                </div>
+                <div class="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+                    Awaiting Review
+                </div>
+            </div>
+            
+            <!-- Submitted Links -->
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">
+                    Submitted Google Drive/Github Links:
+                </label>
+                <div class="bg-gray-50 p-4 rounded-lg border">
+                    <p class="text-gray-700 flex items-center">
+                        <span class="text-lg mr-2">📄</span>
+                        <span class="font-mono text-sm">https://google-drive/deliverables</span>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Review Decision -->
+            <div class="space-y-3">
+                <label for="reviewDecision" class="block text-sm font-medium text-gray-700">
+                    Review Decision
+                </label>
+                <div class="space-y-3">
+                    <div class="flex items-center">
+                        <input 
+                            type="radio" 
+                            id="approve" 
+                            name="reviewDecision" 
+                            value="approve"
+                            class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+                        >
+                        <label for="approve" class="ml-3 text-sm font-medium text-gray-700">
+                            Approve
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        <input 
+                            type="radio" 
+                            id="revisions" 
+                            name="reviewDecision" 
+                            value="revisions"
+                            class="h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300"
+                        >
+                        <label for="revisions" class="ml-3 text-sm font-medium text-gray-700">
+                            Request Revisions
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        <input 
+                            type="radio" 
+                            id="reject" 
+                            name="reviewDecision" 
+                            value="reject"
+                            class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
+                        >
+                        <label for="reject" class="ml-3 text-sm font-medium text-gray-700">
+                            Reject/Dispute
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Comments & Feedback -->
+            <div class="space-y-2">
+                <label for="reviewComments" class="block text-sm font-medium text-gray-700">
+                    Comments & Feedback
+                </label>
+                <textarea 
+                    id="reviewComments" 
+                    name="reviewComments" 
+                    required 
+                    rows="4"
+                    placeholder="Provide detailed feedback..."
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 resize-vertical"
+                ></textarea>
+            </div>
+            
+            <!-- Submit Button -->
+            <div class="pt-4">
+                <button 
+                    type="submit" 
+                    class="w-full bg-indigo-600 text-white py-3 px-4 rounded-md font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+                >
+                    Submit Review
+                </button>
+            </div>
+        </form>
+        {% elif user.userprofile.role_type == 'Developer'%}
+        <form class="space-y-6">
+            <!-- Milestone Section -->
+            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Milestone:</label>
+                    <span class="text-indigo-600 font-normal">Frontend Development</span>
+                </div>
+                <div class="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+                    Rejected
+                </div>
+            </div>
+            
+            <!-- Submitted Links -->
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">
+                    Submitted Google Drive/Github Links:
+                </label>
+                <div class="bg-gray-50 p-4 rounded-lg border">
+                    <p class="text-gray-700 flex items-center">
+                        <span class="text-lg mr-2">📄</span>
+                        <span class="font-mono text-sm">https://google-drive/deliverables</span>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Comments & Feedback -->
+            <div class="space-y-2">
+                <label for="reviewComments" class="block text-sm font-medium text-gray-700">
+                    Comments & Feedback
+                </label>
+                <p>this project was rejected</p>
+            </div>
+            
+            <!-- Submit Button -->
+            <div class="pt-4">
+                <button 
+                    type="submit" 
+                    class="w-1/2 bg-indigo-600 text-white py-3 px-4 rounded-md font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+                >
+                    Resubmit 
+                </button>
+            </div>
+        </form>
+
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

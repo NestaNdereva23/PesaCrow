@@ -16,4 +16,4 @@ urlpatterns = [
 
     path("milestones/<int:id>/", views.client_milestone_verification, name="client_verify_milestone"),
 
-]
+    ]

@@ -22,7 +22,9 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = ['127.0.0.1', '72c9-41-209-57-164.ngrok-free.app']
+ALLOWED_HOSTS = ['127.0.0.1', '1967-217-199-148-234.ngrok-free.app']
+# settings.py
+CSRF_TRUSTED_ORIGINS = ['https://*.ngrok-free.app']  # For Django CSRF
 
 
 # Application definition
@@ -33,6 +35,7 @@ INSTALLED_APPS = [
     'projects.apps.ProjectsConfig',
     'contracts.apps.ContractsConfig',
     'payment.apps.PaymentConfig',
+    'deliverables.apps.DeliverablesConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

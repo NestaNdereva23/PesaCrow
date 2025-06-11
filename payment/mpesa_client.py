@@ -55,7 +55,7 @@ class MpesaClient:
             "Amount": int(amount),
             "PartyB": self.shortcode,
             "PhoneNumber": mpesa_number,
-            "CallBackURL": "https://6ef6-41-209-57-164.ngrok-free.app/mpesa/callback",
+            "CallBackURL": "https://1967-217-199-148-234.ngrok-free.app/payment/mpesa/callback",
             "AccountReference": account_reference,
             "TransactionDesc": "PesaCrow"
 

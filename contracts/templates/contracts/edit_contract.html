@@ -33,10 +33,12 @@
                 <div class="border-b border-gray-200 pb-4 mb-4">
                     <h3 class="text-xl font-semibold">{{ form.instance.title }} (Editable)</h3>
                 </div>
-                <div class="space-y-4">
+                <div class="space-y-4 border-gray-500">
                     {{ form.id }}
                     {{ form.content }}
+                    <button class="button bg-blue-600">Edit</button>
                 </div>
+
             </div>
             {% endfor %}
 

@@ -40,52 +40,133 @@
   </div>
 
   <!-- filtered projects section -->
-  {% if project_requests %} {% for request in project_requests %}
-
-  <div
-    class="w-full p-4 mt-5 text-center bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8 dark:bg-customBlue"
-  >
-    <h5 class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
-      {{ request.title }}
+{% if project_progress %}
+{% for item in project_progress %}
+<div class="w-full p-2 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-customBlue dark:border-gray-700">
+  <!-- Project Header -->
+  <div class="text-center mb-2">
+    <h5 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+      {{ item.project.title }}
     </h5>
-    <p class="text-start text-white">Client: {{request.sender_email}}</p>
-    <p class="mb-5 text-start text-gray-950 sm:text-lg dark:text-gray-950">
-      Description: {{ request.project_description|truncatechars:100 }}
-    </p>
-    <p class="text-start">Created: {{ request.created_at|date:"M d, Y" }}</p>
-    <p class="text-start text-red-600">Status: {{ request.status}}</p>
-    <div
-      class="items-center justify-between space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse"
-    >
-      <p class="text-start text-white">Budget: Ksh. {{ request.budget }}</p>
-      <form action="{% url 'projects:milestones' request.id %}" method="post">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+      <p class="text-left text-gray-600 dark:text-gray-300">
+        <span class="font-medium">Client:</span> {{item.project.sender_email}}
+      </p>
+      <p class="text-left text-gray-600 dark:text-gray-300">
+        <span class="font-medium">Created:</span> {{ item.project.created_at|date:"M d, Y" }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Project Details -->
+  <div class="mb-2">
+    <div class="flex flex-wrap gap-4 text-sm">
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+        Status: {{ item.project.status}}
+      </span>
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+        Budget: Ksh. {{ item.project.budget }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Compact Milestones Section -->
+  <div class="mb-6">
+    <h6 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">Milestones</h6>
+<div class="space-y-2">
+  {% for milestone in item.milestones %}
+  <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200">
+    <!-- Milestone Icon -->
+    <div class="flex-shrink-0">
+      {% if milestone.status == 'Completed' %}
+        <div class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+          ✓
+        </div>
+      {% elif milestone.status == 'Pending' %}
+        <div class="w-8 h-8 bg-yellow-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+          ⏳
+        </div>
+      {% else %}
+        <div class="w-8 h-8 bg-gray-400 text-white rounded-full flex items-center justify-center text-sm font-bold">
+          ○
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Milestone Content -->
+    <div class="flex-grow min-w-0">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div class="flex-grow">
+          <h4 class="font-medium text-gray-900 dark:text-white text-sm">
+            {{ milestone.title }}
+          </h4>
+          <div class="flex items-center gap-2 text-xs mt-1">
+            <span class="px-2 py-1 {% if milestone.status == 'Completed' %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200{% elif milestone.status == 'Pending' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200{% else %}bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200{% endif %} rounded-full">
+              {{ milestone.status }}
+            </span>
+            <span class="font-medium text-gray-600 dark:text-gray-300">
+              Ksh. {{ milestone.payment_amount }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Payment Button for Clients -->
+        {% if user.userprofile.role_type == 'Developer'%}
+        <div class="flex-shrink-0">
+          <a href="{% url 'deliverables:milestone_detail' milestone.id %}"
+             class="inline-flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
+            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+            </svg>
+            Submit Deliverables
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{#  </div>#}
+
+  <!-- Action Buttons -->
+  <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+    <div class="flex flex-col sm:flex-row gap-3 sm:justify-center">
+      <form action="{% url 'projects:milestones' item.project.id %}" method="post" class="flex-1 sm:flex-initial">
         {% csrf_token %}
         <button
           type="submit"
           name="create_milestones"
-          class="w-40 text-white bg-gray-900 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+          class="w-full sm:w-40 text-white bg-gray-800 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-600"
         >
-          Create Milestones
+          View Milestones
         </button>
       </form>
-      <div>
-        <form
-          action="{% url 'projects:accept_project' request.id %}"
-          method="post"
+
+      <form action="{% url 'projects:accept_project' item.project.id %}" method="post" class="flex-1 sm:flex-initial">
+        {% csrf_token %}
+        <button
+          type="submit"
+          class="w-full sm:w-40 text-white bg-green-800 hover:bg-blue-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors duration-200 dark:bg-800-600 dark:hover:bg-green-500"
         >
-          {% csrf_token %}
-          <button
-            type="submit"
-            class="w-40 text-white bg-gray-900 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-          >
-            Accept
-          </button>
-        </form>
-      </div>
+          Accept Project
+        </button>
+      </form>
     </div>
   </div>
-  {% endfor %} {% else %}
-  <p>No project requests found.</p>
-  {% endif %}
+</div>
+{% endfor %}
+
+{% else %}
+<div class="text-center py-12">
+  <div class="text-gray-500 dark:text-gray-400 mb-4">
+    <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  </div>
+  <p class="text-lg font-medium text-gray-600 dark:text-gray-400">No project requests found.</p>
+  <p class="text-sm text-gray-500 dark:text-gray-500 mt-1">Your projects will appear here once you receive them.</p>
+</div>
+{% endif %}
 </div>
 {% endblock %}

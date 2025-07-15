@@ -101,8 +101,7 @@ def populate_contract_with_project_data(contract, project_request):
         # Replace project details
         project_content = project_content.replace('[Provide a more detailed description of the project here.]', project_request.project_description)
         
-        # You might want to add start_date and end_date to your ProjectRequest model
-        # For now, use created_at as start date and leave end date blank
+        
         project_content = project_content.replace('[Project Start Date]', project_request.created_at.strftime('%Y-%m-%d'))
         project_content = project_content.replace('[Projected End Date]', '')
         
@@ -119,12 +118,12 @@ def populate_contract_with_project_data(contract, project_request):
             
         project_content = project_content.replace('● Milestone 1: [Description & Expected Completion Date]\n● Milestone 2: [Description & Expected Completion Date]\n● ...', milestones_text)
         
-        # Add budget information to the project details if available
+        
         if project_request.budget:
             budget_text = f"\n● Budget: ${project_request.budget}"
             project_content += budget_text
             
-        # Add requirements if available
+        
         if project_request.requirements:
             requirements_text = f"\n● Requirements: {project_request.requirements}"
             project_content += requirements_text
@@ -147,8 +146,8 @@ def populate_contract_with_project_data(contract, project_request):
             milestones = Milestone.objects.filter(project=project_request)
             if milestones.exists():
                 milestone_count = milestones.count()
-                upfront_percentage = 25  # Example: 25% upfront
-                final_percentage = 25    # Example: 25% on completion
+                upfront_percentage = 25  
+                final_percentage = 25   
                 milestone_percentage = (100 - upfront_percentage - final_percentage) / milestone_count
                 
                 # Update the payment schedule

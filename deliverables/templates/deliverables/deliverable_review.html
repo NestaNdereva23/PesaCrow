@@ -1,0 +1,146 @@
+{% load static %}
+{% include "sidebar.html" %}
+{% block content %}
+<div class="p-4 sm:ml-64">
+    <p class="text-2xl m-2 font-semibold tracking-tight leading-none text-black">
+        Deliverables
+    </p>
+    <hr class="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700" />
+
+    <!-- Review & Feedback Screen -->
+    <div class="bg-gray-200 shadow-lg rounded-lg p-6 mt-4">
+        {% if user.userprofile.role_type == 'Client' %}
+        <form class="space-y-6" method="post" action="{% url 'deliverables:review_deliverables' deliverable.id %}">
+            {% csrf_token %}
+            <input type="hidden" name="deliverable_id" value="{{ deliverable.id }}">
+                <!-- Milestone Section -->
+             <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Milestone:</label>
+                    <span class="text-indigo-600 font-normal">{{ deliverable.milestone.title }}</span>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Developer:</label>
+                    <span class="text-gray-600">{{ deliverable.developer.get_full_name|default:deliverable.developer.username }}</span>
+                </div>
+                <div class="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+                    {{ deliverable.get_status_display }}
+                </div>
+            </div>
+            <!-- Deliverable Details -->
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Title:</label>
+                    <p class="text-gray-900 font-medium">{{ deliverables.title }}</p>
+                </div>
+
+                {% if deliverable.description %}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description:</label>
+                    <p class="text-gray-700">{{ deliverable.description }}</p>
+                </div>
+                {% endif %}
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Submitted:</label>
+                    <p class="text-gray-600 text-sm">{{ deliverable.submitted_at|date:"M d, Y H:i" }}</p>
+                </div>
+            </div>
+
+
+            <!-- Submitted Links -->
+            {% if deliverable.submission_link %}
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700">
+                    Submitted Link:
+                </label>
+                <div class="bg-gray-50 p-4 rounded-lg border">
+                    <p class="text-gray-700 flex items-center">
+                        <span class="text-lg mr-2">📄</span>
+                        <a href="{{ deliverable.submission_link }}" target="_blank"
+                           class="font-mono text-sm text-blue-600 hover:text-blue-800 underline">
+                            {{ deliverable.submission_link }}
+                        </a>
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Review Decision -->
+            <div class="space-y-3">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Review Decision <span class="text-red-500">*</span>
+                        </label>
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <input
+                                    type="radio"
+                                    id="approve_{{ deliverable.id }}"
+                                    name="reviewDecision"
+                                    value="approve"
+                                    class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+                                    required
+                                >
+                                <label for="approve_{{ deliverable.id }}" class="ml-3 text-sm font-medium text-gray-700">
+                                    Approve
+                                </label>
+                            </div>
+                            <div class="flex items-center">
+                                <input
+                                    type="radio"
+                                    id="revisions_{{ deliverable.id }}"
+                                    name="reviewDecision"
+                                    value="revisions"
+                                    class="h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300"
+                                    required
+                                >
+                                <label for="revisions_{{ deliverable.id }}" class="ml-3 text-sm font-medium text-gray-700">
+                                    Request Revisions
+                                </label>
+                            </div>
+                            <div class="flex items-center">
+                                <input
+                                    type="radio"
+                                    id="reject_{{ deliverable.id }}"
+                                    name="reviewDecision"
+                                    value="reject"
+                                    class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300"
+                                    required
+                                >
+                                <label for="reject_{{ deliverable.id }}" class="ml-3 text-sm font-medium text-gray-700">
+                                    Reject/Dispute
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+            <!-- Comments -->
+           <div class="space-y-2">
+                <label for="reviewComments_{{ deliverable.id }}" class="block text-sm font-medium text-gray-700">
+                    Comments & Feedback <span class="text-red-500">*</span>
+                </label>
+                <textarea
+                    id="reviewComments_{{ deliverable.id }}"
+                    name="reviewComments"
+                    required
+                    rows="4"
+                    minlength="10"
+                    placeholder="Provide detailed feedback (minimum 10 characters)..."
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 resize-vertical"
+                ></textarea>
+                <p class="text-xs text-gray-500">Minimum 10 characters required</p>
+           </div>
+
+            <!-- Submit Button -->
+            <div class="pt-4">
+                <button
+                    type="submit"
+                    class="w-full bg-indigo-600 text-white py-3 px-4 rounded-md font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+                >
+                    Submit Review/Release Funds
+                </button>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

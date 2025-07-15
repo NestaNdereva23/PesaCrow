@@ -1,0 +1,84 @@
+{% load static %}
+{% include "sidebar.html" %}
+{% block content %}
+<div class="p-4 sm:ml-64">
+    <p class="text-2xl m-2 font-semibold tracking-tight leading-none text-black">
+        Disputes List
+    </p>
+    <hr class="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700" />
+
+    <div class="bg-gray-200 shadow-lg rounded-lg p-6 mt-4">
+        {% if disputes %}
+        <div class="grid grid-cols-1 gap-4">
+            {% for dispute in disputes %}
+            <div class="bg-white rounded-lg shadow p-4 flex flex-col md:flex-row md:items-center md:justify-between">
+                <div class="flex-1 space-y-1 text-sm text-gray-700">
+                    <div><strong>Deliverable:</strong> {{ dispute.deliverable.title }}</div>
+                    <div class="flex flex-wrap gap-x-6">
+                        <div><strong>Raised By:</strong> {{ dispute.raised_by.username }}</div>
+                        <div><strong>Against:</strong> {{ dispute.raised_against.username }}</div>
+                        <div class="truncate max-w-xs"><strong>Summary:</strong> {{ dispute.issue_summary }}</div>
+                        <div><strong>Escalation Deadline:</strong>
+                            {% if dispute.escalation_deadline %}
+                                {{ dispute.escalation_deadline|date:"M d, Y H:i" }}
+                            {% else %}
+                                <span class="text-gray-400">-</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2 md:mt-0 md:text-right space-y-2">
+                    <!-- Status Badge -->
+                    {% if dispute.status == 'open' %}
+                        <span class="px-2 py-1 inline-flex text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                            {{ dispute.get_status_display }}
+                        </span>
+                    {% elif dispute.status == 'resolved_by_parties' %}
+                        <span class="px-2 py-1 inline-flex text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                            {{ dispute.get_status_display }}
+                        </span>
+                    {% elif dispute.status == 'escalated' or dispute.status == 'resolved_by_admin' %}
+                        <span class="px-2 py-1 inline-flex text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                            {{ dispute.get_status_display }}
+                        </span>
+                    {% else %}
+                        <span class="px-2 py-1 inline-flex text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                            {{ dispute.get_status_display }}
+                        </span>
+                    {% endif %}
+
+                    <!-- Actions -->
+                    {% if dispute.status == 'open' and request.user == dispute.raised_by or request.user == dispute.raised_against %}
+                        <div class="flex justify-end gap-2 mt-1">
+                            <a href="{% url 'disputes:resolve_dispute' dispute.id %}"
+                               class="inline-flex items-center px-3 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-full hover:bg-green-200">
+                                Resolve
+                            </a>
+                            <a href="{% url 'disputes:escalate_dispute_manually' dispute.id %}"
+                               class="inline-flex items-center px-3 py-1 text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200">
+                                Escalate
+                            </a>
+                        </div>
+                    {% elif dispute.status == 'escalated' %}
+                        <span class="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-500 bg-gray-100 rounded-full">
+                            Awaiting Admin Review
+                        </span>
+                    {% else %}
+                        <span class="text-gray-400 text-xs">No Actions</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No disputes</h3>
+            <p class="mt-1 text-sm text-gray-500">No disputes have been raised yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

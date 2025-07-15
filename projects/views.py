@@ -38,7 +38,6 @@ def developers_projects(request):
             'milestone_percentage':milestone_percentage
         })
     # print(Milestone.objects.filter(project_requests, status="completed").query)
-    print(project_progress)
     context = {
         'project_progress':project_progress
     }

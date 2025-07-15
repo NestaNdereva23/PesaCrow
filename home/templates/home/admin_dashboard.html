@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="p-8">
+    <h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Escalated Disputes Card -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-2">Escalated Disputes</h2>
+            <p>View and resolve disputes escalated to admin.</p>
+            <div class="mt-4">
+                <a href="#" class="text-blue-600 hover:underline">Go to Disputes</a>
+            </div>
+        </div>
+        <!-- Fund Release Requests Card -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-2">Fund Release Requests</h2>
+            <p>Approve and release escrow funds for completed milestones.</p>
+            <div class="mt-4">
+                <a href="#" class="text-blue-600 hover:underline">Go to Fund Releases</a>
+            </div>
+        </div>
+        <!-- Project Monitoring Card -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-2">Project Monitoring</h2>
+            <p>Monitor active projects, milestones, and contracts.</p>
+            <div class="mt-4">
+                <a href="#" class="text-blue-600 hover:underline">View Projects</a>
+            </div>
+        </div>
+        <!-- Alerts/Notifications Card -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-2">Admin Alerts</h2>
+            <p>See actions requiring your attention.</p>
+            <div class="mt-4">
+                <a href="#" class="text-blue-600 hover:underline">View Alerts</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -3,10 +3,13 @@ from . import views
 from django.urls import path
 from django.contrib.auth import views as auth_views
 
-from .views import DashboardView
+from .views import dashboard_view
+
+# from .views import DashboardView
 
 app_name = "home"
 urlpatterns = [
+    path('admin-dashboard/', views.admin_dashboard_view, name='admin_dashboard'),
     path('', views.homepage, name='home'),
     path('login/', views.login_page, name="login"),
     path("logout/", views.logoutPage, name="logout"),
@@ -18,7 +21,9 @@ urlpatterns = [
     path('password_reset_confirm/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path('password_reset_complete/', auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
 
-    path('dashboard/', DashboardView.as_view(), name='dashboard'),
+    path('dashboard/', views.dashboard_view, name='dashboard'),
+
+    # path('dashboard/project_detail<int:id>' views.d)
 
 
 ]

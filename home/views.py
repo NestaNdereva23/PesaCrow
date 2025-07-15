@@ -14,9 +14,22 @@ from .forms import  RegistrationForm
 from projects.models import ProjectRequest,Milestone
 from contracts.models import Contract
 from django.views.generic import TemplateView
-from django.db.models import Count
-
+from django.db.models import Count, Sum, Q
+from disputes.models import Dispute, Deliverable
 # Create your views here.
+from django.contrib.admin.views.decorators import staff_member_required
+
+@staff_member_required
+def admin_dashboard_view(request):
+    # Placeholder summary data for now
+    context = {
+        'disputes_count': 0,
+        'fund_release_count': 0,
+        'project_count': 0,
+        'alerts_count': 0,
+    }
+    return render(request, 'home/admin_dashboard.html', context)
+
 def homepage(request):
     return render(request, 'home/homepage.html')
 
@@ -61,107 +74,59 @@ def login_page(request):
 
 
 #user dashboard view
-class DashboardView(TemplateView):
-    template_name = "home/dashboard.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        project = get_object_or_404(ProjectRequest)
-        dashboard_active_projects = ProjectRequest.objects.filter(
-            status='Active')
-        no_of_milestones = Milestone.objects.filter(project=project).count()
-        
-        context = {
-            'active_projects': dashboard_active_projects,
-            'no_of_milestones': no_of_milestones,
-        }
-        print(context)
-        return context
-
-    '''
-        TODO Escrow Account display
-        Total Escrow Amount $$$, Project Name: Milestone: Milestone Amount
-        The displayed amount is already the one deposited by client and held in the escrow account(PesaCrow bank/mpesa account)**
-        ---Escrow Account (model)
-        
-    '''
-
-@login_required
-def dashboard(request):
-
+def dashboard_view(request):
     user = request.user
-     #check if fistname and lastname are blanks if so redirect to profile
-    if user.first_name == "" and user.last_name == "":
-        return redirect(reverse('profiles:profile'))
+    if user.is_superuser:
+        return redirect(reverse('home:admin_dashboard'))
 
-    context = {}
+    profile = user.userprofile
+    is_client = profile.role_type == 'Client'
 
-   #check if user is client
-    if user.userprofile.role_type == 'Client':
-
-        try:
-            project_requests = ProjectRequest.objects.filter(sender_email=request.user.email, verified=True)
-            payment_needed = False
-            for project in project_requests:
-                    #checkif contract is verified i.e approved by the client after allmilestones have been added
-                    if project.verified:
-
-                        #check if there is a contract associated with the active project to avoid null error is none exists   
-                        if hasattr(project, 'contract') and project.contract is not None:
-                                
-                            if project.contract.signed_by_client and project.contract.signed_by_developer:
-                                #check for pending miestone
-                                pending_milestone = Milestone.objects.filter(
-                                    project=project,
-                                    status='Pending',
-                                    payment_status='Unpaid'
-                                    ).order_by('order_number').first()
-                            
-                                if pending_milestone:
-                                    #store the milestone id session for use in payment view
-                                    request.session['pending_milestone_id'] = pending_milestone.id
-                                    payment_needed=True
-                                    break
-                        else:
-                            #remove any sessions stored if any
-                            if 'pending_milestone_id' in request.session:
-                                del request.session['pending_milestone_id']
-                            
-                                return redirect(reverse('home:dashboard'))
-
-            
-            if payment_needed:
-                 #Prompt payment page with the top milestone to client
-                return redirect('payment:milestone_payment')
-        except ProjectRequest.DoesNotExist:
-            return HttpResponseForbidden("You dont have any project")
-
-    #developer dashboard logic
-    elif user.userprofile.role_type == 'Developer':
-        try:
-
-            project_requests = ProjectRequest.objects.filter(receiver_email=request.user.email, verified=True)
-            
-            active_milestones = Milestone.objects.filter(
-                            project__in = project_requests, 
-                            status='Active'
-                            ).order_by('project','order_number')
-            
-            pending_milestones = Milestone.objects.filter(
-                project__in=project_requests,
-                status = 'Pending'
-            ).order_by('project', 'order_number')
-
-            context = {
-                "projects":project_requests,
-                "active_milestones":active_milestones,
-                "pending_milestones":pending_milestones,
-            }
-        
-        except ProjectRequest.DoesNotExist:
-            return HttpResponseForbidden("forbidden")
+    if is_client:
+        active_projects = ProjectRequest.objects.filter(user=user, status='Active')
+    else:
+        active_projects = ProjectRequest.objects.filter(receiver_email=user.email, status='Active')
 
 
+    active_projects_data = []
+    for project in active_projects:
+        milestones = project.project_milestones.all()
+        total = milestones.count()
+        completed = milestones.filter(status='Completed').count()
+        progress = int((completed / total) * 100) if total > 0 else 0
+
+        active_projects_data.append({
+            'project': project,
+            'total': total,
+            'completed': completed,
+            'progress': progress,
+        })
+
+    pending_milestones = Milestone.objects.filter(
+        project__in=active_projects, status='Pending'
+    )
+
+    escrow_total = Milestone.objects.filter(
+        project__in=active_projects, payment_status='Paid'
+    ).aggregate(total=Sum('payment_amount'))['total'] or 0
+
+    disputes = Dispute.objects.filter(
+        Q(raised_by=user) | Q(raised_against=user)
+    )
+
+    pending_reviews = Deliverable.objects.filter(
+        milestone__project__receiver_email=user.email,
+        status='pending'
+    ) if not is_client else []
+
+    context = {
+        'active_projects': active_projects,
+        'active_projects_data': active_projects_data,
+        'pending_milestones': pending_milestones,
+        'escrow_total': escrow_total,
+        'disputes': disputes,
+        'pending_reviews': pending_reviews,
+    }
     return render(request, 'home/dashboard.html', context)
 
 
@@ -171,24 +136,6 @@ def logoutPage(request):
     logout(request)
     return redirect(reverse('home:home'))
 
-'''
-    TODO Dashboard active projects 
-    should display projectname, no of milestones, budget
-'''
-def active_projects(request):
-    #filter active projects
-    active_projects = ProjectRequest.objects.all()
 
-    
-    context = {
-
-    }
-    return render(request, 'home/dashboard.html', context)
-
-'''
-    TODO Escrow Account display
-    Total Escrow Amount $$$, Project Name: Milestone: Milestone Amount
-
-'''
 def escrow_account(request):
     pass

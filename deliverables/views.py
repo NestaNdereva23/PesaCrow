@@ -1,20 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponse, Http404
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
+from django.urls import reverse
 from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.conf import settings
 from django.utils import timezone
 from django.db import transaction
-import json
-import mimetypes
-import os
-
 from .models import Milestone, Deliverable, DeliverableReview
-from .forms import DeliverableSubmissionForm
+from .forms import DeliverableSubmissionForm, DeliverableReviewForm
 
 
 ''' Handle deliverable submission from developer to client'''
@@ -77,8 +69,84 @@ def submit_deliverable(request, milestone_id):
 
 """ Clients deliverables i.e active, underreview"""
 def deliverables_list(request):
+    user = request.user
     available_deliverables = Deliverable.objects.filter()
+    client_deliverables = Deliverable.objects.filter(
+        milestone__project__sender_email=request.user.email,
+        status__in=['pending', 'approved', 'revision_requested', 'rejected', 'dispute_raised']
+    ).select_related('milestone', 'milestone__project', 'developer')
+
     context = {
         "available_deliverables": available_deliverables,
+        "client_deliverables":client_deliverables,
     }
     return render(request, "deliverables/deliverables_list.html", context)
+
+def review_deliverables(request, deliverable_id):
+    submitted_deliverables = Deliverable.objects.filter(
+        status="pending",
+        milestone__project__sender_email=request.user.email
+    ).select_related('milestone', 'milestone__project','developer')
+    print(submitted_deliverables)
+    if request.method == "POST":
+        deliverable_id = request.POST.get('deliverable_id')
+        decision = request.POST.get('reviewDecision')
+        comments = request.POST.get('reviewComments', '').strip()
+
+        deliverable = get_object_or_404(
+            Deliverable,
+            id=deliverable_id,
+            status="pending",
+            milestone__project__sender_email=request.user.email,
+
+        )
+        print(deliverable)
+        # Map form values to model choices
+        status_mapping = {
+            'approve': 'approved',
+            'revisions': 'revision_requested',
+            'reject': 'rejected'
+        }
+        new_status = status_mapping.get(decision)
+        if not new_status:
+            messages.error(request, "Invalid review decision.")
+            return render(request, "deliverables/deliverables_list.html", {
+                "submitted_deliverables": submitted_deliverables,
+            })
+
+        try:
+            with transaction.atomic():
+                # Update the deliverable status and comments
+                deliverable.status = new_status
+                deliverable.reviewer_comments = comments
+                deliverable.reviewed_at = timezone.now()
+                deliverable.save()
+
+                # Create a review record for history tracking
+                DeliverableReview.objects.create(
+                    deliverable=deliverable,
+                    reviewer=request.user,
+                    decision=new_status,
+                    comments=comments
+                )
+
+                # Success message based on decision
+                if new_status == 'approved':
+                    messages.success(request, f"Deliverable '{deliverable.title}' has been approved. Funds will be released to the developer")
+                elif new_status == 'revision_requested':
+                    messages.info(request, f"Revision requested for deliverable '{deliverable.title}'.")
+                else:  # rejected
+                    messages.warning(request, f"Deliverable '{deliverable.title}' has been rejected.")
+
+                return redirect(reverse('home:dashboard'))
+        except Exception as e:
+            messages.error(request, f"An error occurred while processing your review: {str(e)}")
+    deliverable = Deliverable.objects.select_related(
+        'milestone', 'milestone__project', 'developer'
+    ).get(id=deliverable_id)  # use your id, e.g., 2
+
+    context = {
+        # "deliverables": submitted_deliverables,
+        'deliverable':deliverable
+    }
+    return render(request, "deliverables/deliverable_review.html", context)

@@ -1,0 +1,102 @@
+{% load static %}
+{% include "sidebar.html" %}
+{% block content %}
+<div class="p-4 sm:ml-64">
+    <p class="text-2xl m-2 font-semibold tracking-tight leading-none text-black">
+        Raise a Dispute
+    </p>
+    <hr class="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700" />
+
+    <div class="bg-gray-200 shadow-lg rounded-lg p-6 mt-4">
+        <div class="bg-white rounded-lg p-6 shadow-sm">
+            <div class="text-lg font-semibold text-gray-800 mb-6 pb-2 border-b border-gray-200">
+                Dispute Resolution Screen
+            </div>
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Deliverable:
+                        <span class="font-normal text-indigo-600">{{ deliverable.title }}</span>
+                    </label>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Milestone:
+                        <span class="font-normal text-indigo-600">{{ milestone.title }}</span>
+                    </label>
+                    {% if deliverable.status == 'disputed' %}
+                        <div class="inline-block px-3 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-full">
+                            Disputed
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="space-y-2">
+                    <label for="{{ form.issue_summary.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Reason for Dispute (Summary)
+                    </label>
+                    <div class="mt-1">
+                        {{ form.issue_summary }}
+                    </div>
+                    {% if form.issue_summary.errors %}
+                        <div class="text-red-500 text-sm mt-1">{{ form.issue_summary.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="space-y-2">
+                    <label for="{{ form.detailed_reason.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Detailed Explanation
+                    </label>
+                    <div class="mt-1">
+                        {{ form.detailed_reason }}
+                    </div>
+                    {% if form.detailed_reason.errors %}
+                        <div class="text-red-500 text-sm mt-1">{{ form.detailed_reason.errors }}</div>
+                    {% endif %}
+                </div>
+
+{#                <div class="space-y-2">#}
+{#                    <label for="{{ form.desired_resolution.id_for_label }}" class="block text-sm font-medium text-gray-700">#}
+{#                        Desired Resolution#}
+{#                    </label>#}
+{#                    <div class="mt-1">#}
+{#                        {{ form.desired_resolution }}#}
+{#                    </div>#}
+{#                    {% if form.desired_resolution.errors %}#}
+{#                        <div class="text-red-500 text-sm mt-1">{{ form.desired_resolution.errors }}</div>#}
+{#                    {% endif %}#}
+{#                </div>#}
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Supporting Evidence
+                    </label>
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors cursor-pointer"
+                         onclick="document.getElementById('evidenceInput').click()">
+                        <div class="space-y-1 text-center">
+                            <div class="text-2xl mb-2">📎</div>
+                            <div class="flex text-sm text-gray-600">
+                                <label class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500">
+                                    <span class="font-semibold">Upload supporting documents</span>
+                                    <input type="file" id="evidenceInput" name="evidence[]" multiple class="sr-only">
+                                </label>
+                            </div>
+                            <p class="text-xs text-gray-500">Screenshots, emails, or other evidence</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit"
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        Submit Dispute
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

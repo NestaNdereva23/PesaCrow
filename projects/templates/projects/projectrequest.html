@@ -25,13 +25,13 @@
           >
             Create Project
     </button>
-    <button
+    <!-- <button
             data-dialog-target="create-project-modal"
             class="rounded-md mb-2 mr-3 bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
             type="button"
           >
             Review Deliverables
-    </button>
+    </button> -->
    </div>
 {% if project_progress %}
     {% for item in project_progress %}
@@ -154,9 +154,9 @@
   >
     <div
       data-dialog="create-project-modal"
-      class="relative p-4 w-full max-w-md max-h-full"
+      class="relative p-4 w-full max-w-4xl max-h-full"
           >
-      <div class="relative p-4 w-full max-w-md max-h-full">
+      <div class="relative p-4 w-full max-w-4xl max-h-full">
         <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
         <div
           class="relative m-2.5 items-center flex justify-center text-white h-24 rounded-md bg-slate-800"
@@ -241,7 +241,7 @@
           </div>
             <button
               type="submit"
-              class="h-11 w-56 mt-7 p-2 text-white bg-gray-900 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+              class="col-span-2 h-11 mt-7 text-white bg-gray-900 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
             >
               Send
             </button>

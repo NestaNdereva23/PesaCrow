@@ -78,6 +78,9 @@ def dashboard_view(request):
     user = request.user
     if user.is_superuser:
         return redirect(reverse('home:admin_dashboard'))
+    #check if user has a profile
+    if not hasattr(user, 'userprofile'):
+        return redirect(reverse('profiles:profile'))
 
     profile = user.userprofile
     is_client = profile.role_type == 'Client'

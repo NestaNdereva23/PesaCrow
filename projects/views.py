@@ -61,13 +61,13 @@ def accept_project(request, project_id):
             project.save()
 
             #send email to client
-            send_mail(
-                subject = f'Your project has been accpeted',
-                message = f"Hello, your project '{project.title}' has been accepted by {request.user.email}.",
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[project.sender_email],
-                fail_silently=False,
-            )
+            # send_mail(
+            #     subject = f'Your project has been accpeted',
+            #     message = f"Hello, your project '{project.title}' has been accepted by {request.user.email}.",
+            #     from_email=settings.DEFAULT_FROM_EMAIL,
+            #     recipient_list=[project.sender_email],
+            #     fail_silently=False,
+            # )
             return redirect(reverse('home:dashboard'))
 
 #client project request handling
@@ -104,13 +104,13 @@ def projectrequest(request):
                 PesaCrow Team
                 '''
 
-                send_mail(
-                    subject,
-                    message,
-                    settings.DEFAULT_FROM_EMAIL,
-                    [project_request.receiver_email],
-                    fail_silently=False,
-                )
+                # send_mail(
+                #     subject,
+                #     message,
+                #     settings.DEFAULT_FROM_EMAIL,
+                #     [project_request.receiver_email],
+                #     fail_silently=False,
+                # )
 
                 messages.success(request, "Project request sent successfully!")
                 return redirect(reverse("home:dashboard"))
@@ -205,17 +205,17 @@ def create_milestones(request, project_id):
     if request.method == 'POST' and "verify_milestones" in request.POST:
         if not project.verified:
             #send notification email to sender/client after the developer has finished creating the milestones
-            send_mail(
-                subject=f'Milestone Verification for Project: {project.title}',
-                message=f'''
-                Hello, the developer {request.user.email} has added milestones to '{project.title}'.\n
-                Visit your project dashboard to verify that the milestones align within your scope.\n
-                .If it aligns click on approve button to generate a contract else communicate with the developer until every milestone aligns.
-                ''',
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[project.sender_email],
-                fail_silently=False,
-            )
+            # send_mail(
+            #     subject=f'Milestone Verification for Project: {project.title}',
+            #     message=f'''
+            #     Hello, the developer {request.user.email} has added milestones to '{project.title}'.\n
+            #     Visit your project dashboard to verify that the milestones align within your scope.\n
+            #     .If it aligns click on approve button to generate a contract else communicate with the developer until every milestone aligns.
+            #     ''',
+            #     from_email=settings.DEFAULT_FROM_EMAIL,
+            #     recipient_list=[project.sender_email],
+            #     fail_silently=False,
+            # )
             return redirect(reverse('home:dashboard'))
 
     #default page load
@@ -298,19 +298,19 @@ def client_milestone_verification(request, id):
 
     elif  request.method == 'POST' and "disapprove_milestones" in request.POST:
         if not project.verified:
-            send_mail(
-                subject=f'Milestone Verification for Project: {project.title}',
-                message=f'''
-                                Hello, the client {project.sender_email} disapproved some sections of the milestones.\n
-                                Consult with the client to address the issues.\n
+            # send_mail(
+            #     subject=f'Milestone Verification for Project: {project.title}',
+            #     message=f'''
+            #                     Hello, the client {project.sender_email} disapproved some sections of the milestones.\n
+            #                     Consult with the client to address the issues.\n
 
-                                Best regards,\n
-                                PesaCrow Team :)
-                                ''',
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[project.receiver_email],
-                fail_silently=False,
-            )
+            #                     Best regards,\n
+            #                     PesaCrow Team :)
+            #                     ''',
+            #     from_email=settings.DEFAULT_FROM_EMAIL,
+            #     recipient_list=[project.receiver_email],
+            #     fail_silently=False,
+            # )
             return redirect(reverse('home:dashboard'))
 
     # user is authorized to see the milestones

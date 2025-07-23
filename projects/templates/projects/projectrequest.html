@@ -8,11 +8,9 @@
   <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
 
   {% if messages %} {% for m in messages %}
-  <p>{{m}}</p>
+  <p class="text-red-500 text-center text-sm font-semibold">{{m}}</p>
   {% endfor %} {% endif %}
 
-
-  <!-- TODO move the project creation form to a modal for better UI -->
    <div class="flex flex-auto">
 
     <button class="rounded-md mb-2 mr-3 bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all ">
@@ -232,10 +230,10 @@
               >
               <input
                 type="email"
-                name="receiver"
-                id="receiver"
+                name="receiver_email"
+                id="receiver_email"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                placeholder="client/org email"
+                placeholder="client/organizations email"
               />
               <!-- {{form.receiver_email}} -->
           </div>

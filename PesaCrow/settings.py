@@ -54,7 +54,7 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 #if on windows
-# NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
+NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

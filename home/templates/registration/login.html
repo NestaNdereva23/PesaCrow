@@ -12,8 +12,8 @@
       <div
         class="max-w-md p-4 space-y-2 bg-secondaryblue border border-gray-200 rounded-lg md:space-y-6 sm:p-8"
       >
-        {% if form.errors %} {% for message in messages %}
-        <p>{{ message }}</p>
+        {% if messages %} {% for message in messages %}
+        <p class="text-red-500">{{ message }}</p>
         {% endfor %} {% endif %}
 
         <form method="post" class="max-w-md space-y-4 md:space-y-6">

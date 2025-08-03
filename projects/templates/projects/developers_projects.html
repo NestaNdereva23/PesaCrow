@@ -40,6 +40,7 @@
   </div>
 
   <!-- filtered projects section -->
+<!--TODO check is project request is verified by client if verified show the project else show the pending approval -->
 {% if project_progress %}
 {% for item in project_progress %}
 <div class="w-full p-2 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 dark:bg-customBlue dark:border-gray-700">
@@ -63,6 +64,9 @@
     <div class="flex flex-wrap gap-4 text-sm">
       <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
         Status: {{ item.project.status}}
+      </span>
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+        Verified: {{ item.project.verified }}
       </span>
       <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
         Budget: Ksh. {{ item.project.budget }}
@@ -132,17 +136,30 @@
   <!-- Action Buttons -->
   <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
     <div class="flex flex-col sm:flex-row gap-3 sm:justify-center">
+      <!-- check if the project is active , if active show the milestones button else show the accept project button-->
+      {% if item.project.status == 'Active' %}
       <form action="{% url 'projects:milestones' item.project.id %}" method="post" class="flex-1 sm:flex-initial">
         {% csrf_token %}
+          <!-- if milestone count is 0 show the create milestones button else show the view milestones button-->
+        {% if item.milestones.count == 0 %}
         <button
           type="submit"
           name="create_milestones"
           class="w-full sm:w-40 text-white bg-gray-800 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-600"
         >
+          Create Milestones
+        </button>
+        {% else %}
+        <button
+          type="submit"
+          name="view_milestones"
+          class="w-full sm:w-40 text-white bg-gray-800 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors duration-200 dark:bg-gray-700 dark:hover:bg-gray-600"
+        >
           View Milestones
         </button>
+        {% endif %}
       </form>
-
+      {% else %}
       <form action="{% url 'projects:accept_project' item.project.id %}" method="post" class="flex-1 sm:flex-initial">
         {% csrf_token %}
         <button
@@ -152,6 +169,7 @@
           Accept Project
         </button>
       </form>
+      {% endif %}
     </div>
   </div>
 </div>
@@ -168,5 +186,6 @@
   <p class="text-sm text-gray-500 dark:text-gray-500 mt-1">Your projects will appear here once you receive them.</p>
 </div>
 {% endif %}
+
 </div>
 {% endblock %}

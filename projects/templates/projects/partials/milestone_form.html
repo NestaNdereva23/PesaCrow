@@ -1,20 +1,50 @@
 
 {% block content %}
 <form
+  class="flex flex-col gap-4 mb-4 mt-4 p-4 bg-white rounded-lg shadow-sm border border-gray-200"
   hx-post="{% url 'projects:milestones' project.id %}"
   hx-swap="outerHTML"
   hx-target="this"
 >
-  {% csrf_token %} {{ form.as_p }}
+  {% csrf_token %} 
+  <div class="flex flex-col gap-4 mb-4 ">
+    <label for="{{ form.title.id_for_label }}" class="text-sm font-medium text-gray-700">Title</label>
+    {{ form.title }}
+    <label for="{{ form.description.id_for_label }}" class="text-sm font-medium text-gray-700">Description</label>
+    {{ form.description }}
+    <label for="{{ form.deliverables.id_for_label }}" class="text-sm font-medium text-gray-700">Deliverables</label>
+    {{ form.deliverables }}
+    <label for="{{ form.payment_amount.id_for_label }}" class="text-sm font-medium text-gray-700">Payment Amount</label>
+    {{ form.payment_amount }}
+    <label for="{{ form.estimated_completion.id_for_label }}" class="text-sm font-medium text-gray-700">Estimated Completion</label>
+    {{ form.estimated_completion }}
+  </div>
   <input type="hidden" name="order_number" value="{{ next_order_number }}" />
-  <button type="submit">Save Milestone</button>
-  <button
-    type="button"
-    hx-get="{% url 'projects:milestones' project.id %}?action=cancel"
-    hx-target="this"
-    hx-swap="outerHTML"
-  >
-    Cancel
+
+  <div class="flex flex-row gap-4">
+    <button type="submit" class="w-full sm:w-40 text-white bg-green-950 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+      Save Milestone
+    </button>
+    
+    <button
+      type="button"
+      hx-get="{% url 'projects:milestones' project.id %}?action=cancel"
+      hx-target="this"
+      hx-swap="outerHTML"
+      class="w-full sm:w-40 text-white bg-red-950 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+    >
+      Cancel
+    </button>
+    <script>
+      // Reset the form after successful submission to prevent resubmission
+      document.addEventListener('htmx:afterRequest', function(evt) {
+        if (evt.target.tagName === 'FORM' && evt.target.contains(document.activeElement)) {
+          // Only reset if the form was submitted (not for cancel button)
+          evt.target.reset();
+        }
+      });
+    </script>
   </button>
+  </div>
 </form>
 {% endblock %}

@@ -22,6 +22,7 @@ urlpatterns = [
     path('password_reset_complete/', auth_views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
 
     path('dashboard/', views.dashboard_view, name='dashboard'),
+    path('admin-disputes/', views.admin_disputes, name='admin_disputes'),
 
     # path('dashboard/project_detail<int:id>' views.d)
 

@@ -142,3 +142,12 @@ def logoutPage(request):
 
 def escrow_account(request):
     pass
+
+
+@staff_member_required
+def admin_disputes(request):
+    escalated_disputes = Dispute.objects.filter(status='escalated')
+    context = {
+        'disputes': escalated_disputes,
+    }
+    return render(request, 'home/admin_disputes.html', context)

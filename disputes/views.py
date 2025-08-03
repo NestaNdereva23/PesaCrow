@@ -1,5 +1,5 @@
-from .forms import DisputeForm, DisputeMessageForm
-from .models import Dispute,Deliverable,Milestone, DisputeMessage
+from .forms import DisputeForm, DisputeMessageForm, EvidenceForm, RulingForm
+from .models import Dispute,Deliverable,Milestone, DisputeMessage, Evidence, DECISION_CHOICES
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -7,6 +7,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.urls import reverse
 from django.db.models import Q
+from payment.services import release_funds
 
 # Create your views here.
 def disputes_list(request):
@@ -104,22 +105,64 @@ def escalate_dispute_manually(request, dispute_id):
 
 def dispute_detail(request, dispute_id):
     dispute = get_object_or_404(Dispute, id=dispute_id)
-    messages = DisputeMessage.objects.filter(dispute=dispute)
+    dispute_messages = DisputeMessage.objects.filter(dispute=dispute)
+    evidence_list = Evidence.objects.filter(dispute=dispute)
 
     if request.method == 'POST':
-        form = DisputeMessageForm(request.POST)
-        if form.is_valid():
-            message = form.save(commit=False)
+        message_form = DisputeMessageForm(request.POST)
+        evidence_form = EvidenceForm(request.POST, request.FILES)
+        ruling_form = RulingForm(request.POST)
+
+        if 'submit_message' in request.POST and message_form.is_valid():
+            message = message_form.save(commit=False)
             message.dispute = dispute
             message.sender = request.user
             message.save()
             return redirect('disputes:dispute_detail', dispute_id=dispute.id)
+
+        if 'submit_evidence' in request.POST and evidence_form.is_valid():
+            evidence = evidence_form.save(commit=False)
+            evidence.dispute = dispute
+            evidence.uploader = request.user
+            evidence.save()
+            return redirect('disputes:dispute_detail', dispute_id=dispute.id)
+
+        if 'submit_ruling' in request.POST and ruling_form.is_valid() and request.user.is_superuser:
+            decision = ruling_form.cleaned_data['decision']
+            justification = ruling_form.cleaned_data['justification']
+
+            dispute.status = 'resolved_by_admin'
+            dispute.decision = decision
+            dispute.resolved_at = timezone.now()
+            dispute.save()
+
+            # Add justification as a message from the admin
+            DisputeMessage.objects.create(
+                dispute=dispute,
+                sender=request.user,
+                message=f"**Admin Ruling:** {dict(DECISION_CHOICES)[decision]}\n\n{justification}"
+            )
+
+            # Automated fund release logic
+            if decision == 'developer_favored':
+                release_funds(dispute.raised_against.userprofile.phone_number, dispute.milestone.payment_amount)
+            elif decision == 'client_favored':
+                release_funds(dispute.raised_by.userprofile.phone_number, dispute.milestone.payment_amount)
+
+            messages.success(request, f"Dispute resolved. Decision: {decision}")
+            return redirect('disputes:dispute_detail', dispute_id=dispute.id)
+
     else:
-        form = DisputeMessageForm()
+        message_form = DisputeMessageForm()
+        evidence_form = EvidenceForm()
+        ruling_form = RulingForm()
 
     context = {
         'dispute': dispute,
-        'messages': messages,
-        'form': form,
+        'dispute_messages': dispute_messages,
+        'evidence_list': evidence_list,
+        'message_form': message_form,
+        'evidence_form': evidence_form,
+        'ruling_form': ruling_form,
     }
     return render(request, 'disputes/dispute_detail.html', context)

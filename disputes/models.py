@@ -64,3 +64,17 @@ class DisputeMessage(models.Model):
 
     class Meta:
         ordering = ['created_at']
+
+
+class Evidence(models.Model):
+    dispute = models.ForeignKey(Dispute, on_delete=models.CASCADE, related_name='evidence')
+    uploader = models.ForeignKey(User, on_delete=models.CASCADE, related_name='uploaded_evidence')
+    file = models.FileField(upload_to='evidence/')
+    description = models.TextField(blank=True, null=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Evidence for Dispute #{self.dispute.id} uploaded by {self.uploader.username}"
+
+    class Meta:
+        ordering = ['uploaded_at']

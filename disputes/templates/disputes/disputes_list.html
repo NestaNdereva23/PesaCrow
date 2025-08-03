@@ -58,6 +58,10 @@
                                class="inline-flex items-center px-3 py-1 text-xs font-medium text-red-700 bg-red-100 rounded-full hover:bg-red-200">
                                 Escalate
                             </a>
+                            <a href="{% url 'disputes:dispute_detail' dispute.id %}"
+                               class="inline-flex items-center px-3 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full hover:bg-blue-200">
+                                View
+                            </a>
                         </div>
                     {% elif dispute.status == 'escalated' %}
                         <span class="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-500 bg-gray-100 rounded-full">

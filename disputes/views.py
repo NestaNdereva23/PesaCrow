@@ -1,5 +1,5 @@
-from .forms import DisputeForm
-from .models import Dispute,Deliverable,Milestone
+from .forms import DisputeForm, DisputeMessageForm
+from .models import Dispute,Deliverable,Milestone, DisputeMessage
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -17,6 +17,7 @@ def disputes_list(request):
         'disputes':disputes,
     }
     return render(request, 'disputes/disputes_list.html', context)
+
 def raise_dispute(request, dispute_id):
     deliverable = get_object_or_404(Deliverable, id=dispute_id)
     milestone = deliverable.milestone
@@ -101,36 +102,24 @@ def escalate_dispute_manually(request, dispute_id):
 
     return redirect(reverse('disputes:disputes_list'))
 
+def dispute_detail(request, dispute_id):
+    dispute = get_object_or_404(Dispute, id=dispute_id)
+    messages = DisputeMessage.objects.filter(dispute=dispute)
 
+    if request.method == 'POST':
+        form = DisputeMessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.dispute = dispute
+            message.sender = request.user
+            message.save()
+            return redirect('disputes:dispute_detail', dispute_id=dispute.id)
+    else:
+        form = DisputeMessageForm()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    context = {
+        'dispute': dispute,
+        'messages': messages,
+        'form': form,
+    }
+    return render(request, 'disputes/dispute_detail.html', context)

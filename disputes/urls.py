@@ -9,6 +9,7 @@ urlpatterns = [
     path('dispute/<int:dispute_id>/', views.raise_dispute, name="dispute"),
     path('disputes/resolve_dispute/<int:dispute_id>/', views.resolve_dispute, name="resolve_dispute"),
     path('<int:dispute_id>/escalate/manual/', views.escalate_dispute_manually, name='escalate_dispute_manually'),
+    path('dispute_detail/<int:dispute_id>', views.dispute_detail, name="dispute_detail"),
 
 
 ]

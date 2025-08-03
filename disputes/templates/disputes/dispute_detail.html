@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">Dispute Details</h1>
+
+    <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-2">{{ dispute.issue_summary }}</h2>
+        <p class="text-gray-700 mb-4">{{ dispute.detailed_reason }}</p>
+
+        <div class="grid grid-cols-2 gap-4 text-sm text-gray-600">
+            <div>
+                <p><strong>Project:</strong> {{ dispute.milestone.project.title }}</p>
+                <p><strong>Milestone:</strong> {{ dispute.milestone.name }}</p>
+            </div>
+            <div>
+                <p><strong>Raised by:</strong> {{ dispute.raised_by.username }}</p>
+                <p><strong>Raised against:</strong> {{ dispute.raised_against.username }}</p>
+            </div>
+            <div>
+                <p><strong>Status:</strong> <span class="font-medium text-{{ dispute.status|lower }}">{{ dispute.get_status_display }}</span></p>
+                <p><strong>Created on:</strong> {{ dispute.created_at|date:"Y-m-d H:i" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Communication</h2>
+
+        <div class="space-y-4 mb-6">
+            {% for msg in messages %}
+                <div class="flex {% if msg.sender == request.user %}justify-end{% else %}justify-start{% endif %}">
+                    <div class="w-full md:w-3/4 p-3 rounded-lg {% if msg.sender == request.user %}bg-blue-100 text-right{% else %}bg-gray-100{% endif %}">
+                        <p class="font-semibold">{{ msg.sender.username }}</p>
+                        <p>{{ msg.message }}</p>
+                        <p class="text-xs text-gray-500 mt-1">{{ msg.created_at|date:"Y-m-d H:i" }}</p>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-gray-500">No messages yet.</p>
+            {% endfor %}
+        </div>
+
+        <form method="post" class="mt-6">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label for="id_message" class="block text-sm font-medium text-gray-700">Your Message</label>
+                <textarea name="message" id="id_message" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Type your message here..."></textarea>
+            </div>
+            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Send Message
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -49,7 +49,7 @@ function initiatePayment() {
 
 function pollTransactionStatus(checkoutRequestId) {
     let pollCount = 0;
-    const maxPolls = 24; // Poll for up to 2 minutes (24 * 5 seconds)
+    const maxPolls = 24;
     
     // Poll every 5 seconds
     const statusInterval = setInterval(() => {
@@ -59,10 +59,10 @@ function pollTransactionStatus(checkoutRequestId) {
             if (data.status === 'success') {
                 if (data.payment_status === 'Complete') {
                     clearInterval(statusInterval);
-                    document.getElementById('payment-status').textContent = 'Payment successful! Redirecting...';
+                    document.getElementById('payment-status').textContent = 'Payment successful!';
                     // Redirect to dashboard after 2 seconds
                     setTimeout(() => {
-                        window.location.href = '/dashboard/'; // Use absolute URL instead of template tag
+                        window.location.href = '/home/dashboard/';
                     }, 2000);
                 } else if (data.payment_status === 'Failed') {
                     clearInterval(statusInterval);

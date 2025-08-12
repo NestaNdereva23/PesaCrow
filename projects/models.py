@@ -1,14 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-
+# Defines the possible statuses for a project
 PROJECT_STATUS = [
     ("Pending", "Pending"),
     ("Active", "Active"), 
     ("Completed", "Completed"),
     ("Cancelled", "Cancelled"),
 ]
-
+# Defines the possible statuses for a project
 MILESTONE_STATUS = [
     ("Pending", "Pending"),      # Waiting to be worked on
     ("Active", "Active"),        # Currently being worked on

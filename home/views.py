@@ -33,7 +33,7 @@ def admin_dashboard_view(request):
 def homepage(request):
     return render(request, 'home/homepage.html')
 
-
+# User registration handling
 class RegistrationView(FormView):
     template_name = 'registration/registration.html'
     form_class = RegistrationForm
@@ -53,9 +53,8 @@ class RegistrationView(FormView):
             
         return render(request, self.template_name, {'form': form})
 
-
+# Login view for handling user authentication
 def login_page(request):
-
     if request.method == "POST":
         # email = request.POST.get('email')
         username = request.POST.get('username')

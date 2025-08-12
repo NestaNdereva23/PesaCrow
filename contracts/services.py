@@ -106,7 +106,7 @@ def populate_contract_with_project_data(contract, project_request):
         project_content = project_content.replace('[Projected End Date]', '')
         
         # Get milestones for this project request
-        # from projects.models import Milestone  # Import your actual milestone model
+        # from projects.models import Milestone 
         milestones = Milestone.objects.filter(project=project_request)
         
         milestones_text = ""
@@ -133,7 +133,7 @@ def populate_contract_with_project_data(contract, project_request):
     except ContractSection.DoesNotExist:
         pass
     
-    # Update payment section if available
+    # Update payment section 
     try:
         payment_section = contract.sections.get(template__section_key='budget_and_payment')
         payment_content = payment_section.content

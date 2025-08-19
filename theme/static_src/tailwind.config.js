@@ -49,7 +49,7 @@ module.exports = {
         profile_gray: "#C7C0C0",
         active_green: "#98CE00",
       },
-      fontFamily: {
+ontFamily: {
         sans: ["ui-sans-serif", "system-ui"],
         custom: ["Robot", "serif"],
       },

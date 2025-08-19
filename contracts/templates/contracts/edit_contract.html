@@ -28,25 +28,76 @@
             {% endfor %}
 
             <!-- Display editable sections -->
-            {% for form in formset %}
-            <div class="bg-white shadow-md rounded-lg p-6 mb-6">
-                <div class="border-b border-gray-200 pb-4 mb-4">
-                    <h3 class="text-xl font-semibold">{{ form.instance.title }} (Editable)</h3>
+            {% if not contract.is_signed_by_client and not contract.is_signed_by_freelancer %}
+                {% for form in formset %}
+                <div class="bg-gray-50 shadow-md rounded-lg p-6 mb-6 editable-section" data-section-id="{{ form.instance.id }}">
+                    <div class="border-b border-gray-200 pb-4 mb-4 flex justify-between items-center">
+                        <h3 class="text-xl font-semibold">{{ form.instance.title }} (Editable)</h3>
+                        <button type="button" class="button bg-blue-600 text-white py-1 px-3 rounded edit-button">Edit</button>
+                    </div>
+                    <div class="space-y-4 border-gray-500">
+                        <div class="read-only-content">
+                            {{ form.instance.content|safe }}
+                        </div>
+                        <div class="edit-content hidden">
+                            {{ form.id }}
+                            {{ form.content }}
+                        </div>
+                    </div>
                 </div>
-                <div class="space-y-4 border-gray-500">
-                    {{ form.id }}
-                    {{ form.content }}
-                    <button class="button bg-blue-600">Edit</button>
+                {% endfor %}
+
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Save All Changes
+                </button>
+            {% else %}
+                {% for section in contract.sections.all %}
+                <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+                    <div class="border-b border-gray-200 pb-4 mb-4">
+                        <h3 class="text-xl font-semibold">{{ section.title }}</h3>
+                    </div>
+                    <pre class="whitespace-pre-wrap text-gray-700">{{ section.content|safe }}</pre>
                 </div>
-
-            </div>
-            {% endfor %}
-
-            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                Save Changes
-            </button>
+                {% endfor %}
+            {% endif %}
         </form>
 
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const editableSections = document.querySelectorAll('.editable-section');
+
+        editableSections.forEach(section => {
+            const editButton = section.querySelector('.edit-button');
+            const readOnlyContent = section.querySelector('.read-only-content');
+            const editContent = section.querySelector('.edit-content');
+            const textarea = editContent.querySelector('textarea');
+            let editor;
+
+            editButton.addEventListener('click', () => {
+                if (editButton.textContent === 'Edit') {
+                    readOnlyContent.classList.add('hidden');
+                    editContent.classList.remove('hidden');
+                    editButton.textContent = 'Cancel';
+
+                    if (!editor) {
+                        ClassicEditor
+                            .create(textarea)
+                            .then(newEditor => {
+                                editor = newEditor;
+                            })
+                            .catch(error => {
+                                console.error(error);
+                            });
+                    }
+                } else {
+                    readOnlyContent.classList.remove('hidden');
+                    editContent.classList.add('hidden');
+                    editButton.textContent = 'Edit';
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

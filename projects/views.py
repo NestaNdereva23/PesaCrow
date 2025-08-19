@@ -222,7 +222,6 @@ def create_milestones(request, project_id):
     context = {
         "milestones":milestones,
         "project":project,
-        "project_requests":project_requests,
         "new_milestone_form": MilestonesForm(project=project),
 
     }

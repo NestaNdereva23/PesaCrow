@@ -16,6 +16,7 @@ from contracts.models import Contract
 from django.views.generic import TemplateView
 from django.db.models import Count, Sum, Q
 from disputes.models import Dispute, Deliverable
+from payment.models import MilestonePayment
 # Create your views here.
 from django.contrib.admin.views.decorators import staff_member_required
 
@@ -86,8 +87,14 @@ def dashboard_view(request):
 
     if is_client:
         active_projects = ProjectRequest.objects.filter(user=user, status='Active')
+        recent_payments = MilestonePayment.objects.filter(
+            milestone__project__user=user
+        ).order_by('-created_at')[:5]
     else:
         active_projects = ProjectRequest.objects.filter(receiver_email=user.email, status='Active')
+        recent_payments = MilestonePayment.objects.filter(
+            milestone__project__receiver_email=user.email
+        ).order_by('-created_at')[:5]
 
 
     active_projects_data = []
@@ -128,6 +135,7 @@ def dashboard_view(request):
         'escrow_total': escrow_total,
         'disputes': disputes,
         'pending_reviews': pending_reviews,
+        'recent_payments': recent_payments,
     }
     return render(request, 'home/dashboard.html', context)
 

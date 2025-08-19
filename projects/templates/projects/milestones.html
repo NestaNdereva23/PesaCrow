@@ -8,25 +8,23 @@
   <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
 
   <!-- filtered projects section -->
-  {% if project_requests %} 
-  {% for request in project_requests %}
   <div
     class="w-full p-4 mt-5 text-center bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8 dark:bg-customBlue"
   >
     <h5 class="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
-      {{ request.title }}
+      {{ project.title }}
     </h5>
-    <p class="text-start text-white">Client: {{request.sender_email}}</p>
+    <p class="text-start text-white">Client: {{project.sender_email}}</p>
     <p class="mb-5 text-start text-gray-950 sm:text-lg dark:text-gray-950">
-      Description: {{ request.project_description|truncatechars:100 }}
+      Description: {{ project.project_description|truncatechars:100 }}
     </p>
-    <p class="text-start">Created: {{ request.created_at|date:"M d, Y" }}</p>
-    <p class="text-start text-red-600">Status: {{ request.status}}</p>
-      <p class="text-start text-red-600">Verified: {{ request.verified}}</p>
+    <p class="text-start">Created: {{ project.created_at|date:"M d, Y" }}</p>
+    <p class="text-start text-red-600">Status: {{ project.status}}</p>
+      <p class="text-start text-red-600">Verified: {{ project.verified}}</p>
     <div
       class="items-center justify-between space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse"
     >
-      <p class="text-start text-white">Budget: Ksh. {{ request.budget }}</p>
+      <p class="text-start text-white">Budget: Ksh. {{ project.budget }}</p>
     <div>
         <form method="post">
         {% csrf_token %}
@@ -41,10 +39,6 @@
 
     </div>
   </div>
-  {% endfor %} 
-  {% else %}
-  <p>No project requests found.</p>
-  {% endif %}
 
   <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
 

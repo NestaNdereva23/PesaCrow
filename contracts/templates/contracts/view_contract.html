@@ -5,7 +5,7 @@
     <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
         <div class="px-6 py-8">
             <div class="flex justify-between items-center">
-                <h1 class="text-3xl font-bold text-gray-800">Review Contract</h1>
+                <h1 class="text-3xl font-bold text-gray-800">Contract</h1>
                 <span class="text-sm font-semibold text-gray-500">{{ contract.project.title }}</span>
             </div>
             <div class="mt-8">
@@ -37,14 +37,13 @@
                     </div>
                 </div>
             </div>
+            {% if contract.is_signed_by_client and contract.is_signed_by_freelancer %}
             <div class="mt-8">
-                <form action="{% url 'contracts:sign_contract' contract.id %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit" class="w-full bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded">
-                        Sign Contract
-                    </button>
-                </form>
+                <a href="{% url 'contracts:download_contract_pdf' contract.id %}" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded inline-block text-center">
+                    Download as PDF
+                </a>
             </div>
+            {% endif %}
         </div>
     </div>
 </div>

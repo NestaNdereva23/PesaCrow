@@ -1,50 +1,72 @@
+{% extends "base.html" %}
 {% load static %}
-{% include "sidebar.html" %}
+
+{% block title %}
+PesaCrow | Dashboard
+{% endblock %}
+
 {% block content %}
-<div class="p-4 md:p-8 sm:ml-64 bg-gray-50 dark:bg-gray-900 min-h-screen">
-  <div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Dashboard</h1>
-    <p class="text-gray-500 dark:text-gray-400">Welcome back, {{ user.username }}! Here's a summary of your account.</p>
+{% include "sidebar.html" %}
+<div class="p-4 md:p-8 sm:ml-64 bg-gray-200 min-h-screen">
+  <div class="mb-2 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-bold text-black">Dashboard</h1>
+    </div>
+    <div class="flex items-center">
+          <p class="text-gray-700 mr-4">
+            Welcome back, <span class="font-semibold">{{ user.username }}</span>!
+          </p>
+          <div class="relative">
+            <input type="text" id="referral-link"
+                   class="text-xs text-gray-600 bg-gray-100 rounded-full px-4 py-2 w-64"
+                   value="https://pesacrow.com/ref/{{ user.username }}" readonly>
+            <button onclick="copyToClipboard()"
+                    class="absolute right-0 top-0 h-full px-4 bg-blue-500 text-white rounded-full text-xs hover:bg-blue-600">
+              Copy
+            </button>
+          </div>
+        </div>
   </div>
+<hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
 
   <!-- Summary Cards -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
+    <div class="bg-customBlue p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-sm text-gray-500 dark:text-gray-300">Active Projects</p>
-          <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ active_projects.count }}</p>
+          <p class="text-sm text-gray-200">Active Projects</p>
+          <p class="text-3xl font-bold text-white">{{ active_projects.count }}</p>
         </div>
-        <div class="p-3 bg-blue-100 dark:bg-gray-700 rounded-lg">
-          <svg class="w-6 h-6 text-blue-500 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <div class="p-3 bg-blue-100 rounded-lg">
+          <svg class="w-6 h-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M8.25 21V3m8.25 18V3M3.75 9h16.5m-16.5 6h16.5" />
           </svg>
         </div>
       </div>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
+    <div class="bg-customBlue p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-sm text-gray-500 dark:text-gray-300">Pending Milestones</p>
-          <p class="text-3xl font-bold text-gray-900 dark:text-white">{{ pending_milestones.count }}</p>
+          <p class="text-sm text-gray-200">Pending Milestones</p>
+          <p class="text-3xl font-bold text-white">{{ pending_milestones.count }}</p>
         </div>
-        <div class="p-3 bg-yellow-100 dark:bg-gray-700 rounded-lg">
-          <svg class="w-6 h-6 text-yellow-500 dark:text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <div class="p-3 bg-yellow-100 rounded-lg">
+          <svg class="w-6 h-6 text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
       </div>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
+    <div class="bg-customBlue p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-sm text-gray-500 dark:text-gray-300">Escrow Balance</p>
-          <p class="text-3xl font-bold text-gray-900 dark:text-white">Ksh. {{ escrow_total }}</p>
+          <p class="text-sm text-gray-200">Escrow Balance</p>
+          <p class="text-3xl font-bold text-white">Ksh. {{ escrow_total }}</p>
         </div>
-        <div class="p-3 bg-green-100 dark:bg-gray-700 rounded-lg">
-          <svg class="w-6 h-6 text-green-500 dark:text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <div class="p-3 bg-green-100 rounded-lg">
+          <svg class="w-6 h-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V6.375c0-.621.504-1.125 1.125-1.125h.375m16.5 0h.375a1.125 1.125 0 011.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m0 0h-.375a1.125 1.125 0 01-1.125-1.125V6.375c0-.621.504-1.125 1.125-1.125h.375M3 8.25v1.5m18-1.5v1.5m-15-1.5v1.5m12-1.5v1.5m-9-1.5v1.5m6-1.5v1.5m-3-1.5v1.5m0 0v1.5m3-1.5v1.5m0 0v1.5m-3-1.5v1.5m0 0v1.5m-3-1.5v1.5m0 0v1.5" />
           </svg>
         </div>
@@ -55,21 +77,21 @@
   <!-- Active Projects -->
   <div class="mb-10">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Your Active Projects</h2>
+      <h2 class="text-2xl font-bold text-black">Your Active Projects</h2>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {% for data in active_projects_data %}
       {% with active=data.project completed=data.completed total=data.total progress=data.progress %}
-        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow duration-300">
+        <div class="bg-customBlue rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
           <div class="p-6">
             <div class="flex justify-between items-start mb-4">
               <div>
-                <p class="font-semibold text-gray-900 dark:text-white">{{ active.title }}</p>
-                <p class="text-sm text-gray-600 dark:text-gray-300">Milestones: {{ total }}</p>
-                <p class="text-sm text-gray-600 dark:text-gray-300">Budget: Ksh. {{ active.budget }}</p>
+                <p class="font-semibold text-white">{{ active.title }}</p>
+                <p class="text-sm text-gray-200">Milestones: {{ total }}</p>
+                <p class="text-sm text-gray-200">Budget: Ksh. {{ active.budget }}</p>
               </div>
               <div class="flex items-center">
-                <span class="px-3 py-1 text-xs font-medium text-green-800 bg-green-100 dark:bg-green-900 dark:text-green-300 rounded-full">
+                <span class="px-3 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
                   Active
                 </span>
               </div>
@@ -77,16 +99,16 @@
 
             {% if total > 0 %}
             <div class="mt-4">
-              <p class="text-xs mb-1 text-gray-500 dark:text-gray-300">Progress</p>
-              <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2.5">
+              <p class="text-xs mb-1 text-gray-200">Progress</p>
+              <div class="w-full bg-gray-200 rounded-full h-2.5">
                 <div class="bg-green-500 h-2.5 rounded-full transition-all duration-300" style="width: {{ progress }}%;"></div>
               </div>
-              <p class="text-xs mt-2 text-gray-600 dark:text-gray-400">{{ completed }}/{{ total }} milestones completed</p>
+              <p class="text-xs mt-2 text-gray-300">{{ completed }}/{{ total }} milestones completed</p>
             </div>
             {% endif %}
           </div>
-          <div class="bg-gray-50 dark:bg-gray-700/50 px-6 py-3">
-            <a href="#" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-500 dark:hover:text-blue-400">
+          <div class="bg-gray-100 px-6 py-3">
+            <a href="#" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800">
               View Project
               <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -96,14 +118,14 @@
         </div>
       {% endwith %}
     {% empty %}
-      <div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <svg class="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+      <div class="col-span-1 md:col-span-2 lg:col-span-3 text-center py-12 bg-customBlue rounded-lg shadow-lg">
+        <svg class="mx-auto h-12 w-12 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
         </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No active projects</h3>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">Get started by creating a new project.</p>
+        <h3 class="mt-2 text-sm font-medium text-white">No active projects</h3>
+        <p class="mt-1 text-sm text-gray-200">Get started by creating a new project.</p>
         <div class="mt-6">
-          <a href="{% url 'projects:projectrequest' %}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800">
+          <a href="{% url 'projects:projectrequest' %}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
             Create Project
           </a>
         </div>
@@ -116,15 +138,15 @@
   {% if user.userprofile.role_type == "Developer" %}
   <div class="mb-10">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Pending Deliverable Reviews</h2>
+      <h2 class="text-2xl font-bold text-black">Pending Deliverable Reviews</h2>
     </div>
     <div class="space-y-4">
       {% for d in pending_reviews %}
-      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow duration-300">
+      <div class="bg-customBlue p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm text-gray-900 dark:text-white">{{ d.title }}</p>
-            <p class="text-xs text-gray-500 dark:text-gray-300">Project: {{ d.milestone.project.title }}</p>
+            <p class="text-sm text-white">{{ d.title }}</p>
+            <p class="text-xs text-gray-200">Project: {{ d.milestone.project.title }}</p>
           </div>
           <a href="{{ d.get_review_url }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
             Review
@@ -135,12 +157,12 @@
         </div>
       </div>
       {% empty %}
-      <div class="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="text-center py-12 bg-customBlue rounded-lg shadow-lg">
+        <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No pending reviews</h3>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">All your deliverables are up to date.</p>
+        <h3 class="mt-2 text-sm font-medium text-white">No pending reviews</h3>
+        <p class="mt-1 text-sm text-gray-200">All your deliverables are up to date.</p>
       </div>
       {% endfor %}
     </div>
@@ -150,34 +172,73 @@
   <!-- Disputes -->
   <div>
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Disputes</h2>
+      <h2 class="text-2xl font-bold text-black">Disputes</h2>
     </div>
     <div class="space-y-4">
       {% for dispute in disputes|slice:":3" %}
-      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow duration-300">
+      <div class="bg-customBlue p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
         <div class="flex justify-between items-center">
           <div>
-            <p class="text-sm text-gray-900 dark:text-white font-semibold">{{ dispute.issue_summary }}</p>
-            <p class="text-xs text-gray-500 dark:text-gray-300">Status: {{ dispute.get_status_display }}</p>
+            <p class="text-sm text-white font-semibold">{{ dispute.issue_summary }}</p>
+            <p class="text-xs text-gray-200">Status: {{ dispute.get_status_display }}</p>
           </div>
           <div class="flex items-center">
-            <span class="px-3 py-1 text-xs font-medium text-gray-800 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 rounded-full">
+            <span class="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-200 rounded-full">
               {{ dispute.get_status_display }}
             </span>
           </div>
         </div>
       </div>
       {% empty %}
-      <div class="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="text-center py-12 bg-customBlue rounded-lg shadow-lg">
+        <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No active disputes</h3>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">All your projects are running smoothly.</p>
+        <h3 class="mt-2 text-sm font-medium text-white">No active disputes</h3>
+        <p class="mt-1 text-sm text-gray-200">All your projects are running smoothly.</p>
       </div>
       {% endfor %}
     </div>
   </div>
 
+<!-- Recent Activity -->
+<div class="mt-10">
+    <h2 class="text-2xl font-bold text-black mb-4">Recent Activity</h2>
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <ul class="divide-y divide-gray-200">
+            {% for payment in recent_payments %}
+            <li class="py-4 flex justify-between items-center">
+                <div>
+                    <p class="text-sm font-medium text-gray-900">{{ payment.milestone.project.title }}</p>
+                    <p class="text-xs text-gray-500">Milestone: {{ payment.milestone.title }}</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-semibold text-green-600">Ksh. {{ payment.amount }}</p>
+                    <p class="text-xs text-gray-500">{{ payment.timestamp|date:"F j, Y, g:i a" }}</p>
+                </div>
+            </li>
+            {% empty %}
+            <li class="py-4 text-center text-gray-500">No recent activity.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
 </div>
 {% endblock %}
+<script>
+  function copyToClipboard() {
+    const referralLink = document.getElementById("referral-link");
+    referralLink.select();
+    document.execCommand("copy");
+
+    const tooltip = document.createElement("div");
+    tooltip.textContent = "Copied!";
+    tooltip.className = "absolute bg-gray-800 text-white text-xs rounded-md px-2 py-1 -top-8 left-1/2 -translate-x-1/2";
+    referralLink.parentElement.appendChild(tooltip);
+
+    setTimeout(() => {
+      tooltip.remove();
+    }, 2000);
+  }
+</script>

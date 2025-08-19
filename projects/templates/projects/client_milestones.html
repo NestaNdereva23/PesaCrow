@@ -1,90 +1,109 @@
-{% load static %} {% include "sidebar.html" %} {% block content %}
+{% load static %} 
+{% include "sidebar.html" %} 
+{% block content %}
 
-<div class="p-4 sm:ml-64">
-  <p class="text-2xl m-2 font-semibold tracking-tight leading-none text-black">
-    Projects
+<div class="p-4 sm:ml-64 bg-white min-h-screen">
+  <p class="text-2xl m-2 font-semibold tracking-tight leading-none text-gray-900">
+   Client Projects Milestones
   </p>
-  {{user.username}}
-  <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
+  <hr class="h-px my-4 bg-gray-200 border-0" />
 
-<div class="container mx-auto py-6">
-    <h2 class="text-2xl font-bold mb-4">Project: {{ project.title }}</h2>
+  <div class="container mx-auto py-6">
+    <h2 class="text-2xl font-bold mb-4 text-gray-900">Project: {{ project.title }}</h2>
     
-    <div class="bg-white rounded-lg shadow p-6 mb-6">
-        <h3 class="text-lg font-semibold mb-2">Project Details</h3>
-        <p><strong>Description:</strong> {{ project.project_description }}</p>
-        <p><strong>Budget:</strong> Ksh. {{ project.budget }}</p>
-        <p><strong>Status:</strong> {{ project.status }}</p>
-        <p><strong>verified:</strong> {{ project.verified }}</p>
-    </div>
-    
-
-    <div
-      class="flex bg-gray-300 justify-between space-y-4 sm:flex sm:space-y-0 sm:space-x-4 rtl:space-x-reverse"
-    >
-      <h3 class="text-xl font-bold mb-4">Milestones</h3>
-        <div class="items-center justify-center" >
-            <form method="post">
-            {% csrf_token %}
-            <button
-                name="approve_milestones"
-                type="submit"
-                class="text-white bg-lime-700 hover:bg-lime-950 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-300-600 dark:hover:bg-gray-50-700 focus:outline-none dark:focus:ring-gray-800-800">
-                Approve milestones
-            </button>
-            </form>
+    <div class="bg-customBlue rounded-lg shadow-lg p-6 mb-6">
+      <h3 class="text-lg font-semibold mb-4 text-white">Project Details</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <p class="mb-2"><strong class="text-gray-800">Description:</strong> 
+            <span class="text-gray-900">{{ project.project_description }}</span>
+          </p>
+          <p class="mb-2"><strong class="text-blue-100">Budget:</strong> 
+            <span class="text-white">Ksh. {{ project.budget }}</span>
+          </p>
         </div>
         <div>
-            <form method="post">
+          <p class="mb-2"><strong class="text-blue-100">Status:</strong> 
+            <span class="px-3 py-1 rounded-full text-xs font-medium bg-white text-blue-800">{{ project.status }}</span>
+          </p>
+          <p class="mb-2"><strong class="text-blue-100">Verified:</strong> 
+            {% if project.verified %}
+              <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-500 text-white">Verified</span>
+            {% else %}
+              <span class="px-3 py-1 rounded-full text-xs font-medium bg-yellow-500 text-white">Pending</span>
+            {% endif %}
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-customBlue rounded-lg shadow-lg p-6 mb-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h3 class="text-xl font-bold text-white">Milestones</h3>
+        
+        <div class="flex flex-col sm:flex-row gap-3">
+          <form method="post" class="inline">
             {% csrf_token %}
             <button
-                name="disapprove_milestones"
-                type="submit"
-                class="text-white bg-lime-700 hover:bg-lime-950 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-300-600 dark:hover:bg-gray-50-700 focus:outline-none dark:focus:ring-gray-800-800">
-                Diaspprove milestones
+              name="approve_milestones"
+              type="submit"
+              class="w-full sm:w-auto px-5 py-2.5 text-green-700 bg-white hover:bg-green-50 focus:ring-4 focus:ring-green-200 font-medium rounded-lg text-sm transition-colors duration-200 focus:outline-none border border-green-200">
+              Approve Milestones
             </button>
-            </form>
+          </form>
+          
+          <form method="post" class="inline">
+            {% csrf_token %}
+            <button
+              name="disapprove_milestones"
+              type="submit"
+              class="w-full sm:w-auto px-5 py-2.5 text-red-700 bg-white hover:bg-red-50 focus:ring-4 focus:ring-red-200 font-medium rounded-lg text-sm transition-colors duration-200 focus:outline-none border border-red-200">
+              Disapprove Milestones
+            </button>
+          </form>
         </div>
+      </div>
     </div>
 
-    
     {% if milestones %}
-        <div class="space-y-4">
-            {% for milestone in milestones %}
-                <div class="bg-white rounded-lg shadow p-4 border-l-4 {% if milestone.status == 'Completed' %}border-green-500{% elif milestone.status == 'Active' %}border-blue-500{% else %}border-gray-300{% endif %}">
-                    <h4 class="font-semibold text-lg">{{ milestone.title }}</h4>
-                    <p class="text-sm text-gray-600 mb-2">{{ milestone.description }}</p>
-                    
-                    <div class="grid grid-cols-2 gap-2 text-sm">
-                        <div>
-                            <span class="font-medium">Deliverables:</span>
-                            <span>{{ milestone.deliverables }}</span>
-                        </div>
-                        <div>
-                            <span class="font-medium">Payment:</span>
-                            <span>Ksh. {{ milestone.payment_amount }}</span>
-                        </div>
-                        <div>
-                            <span class="font-medium">Estimated completion:</span>
-                            <span>{{ milestone.estimated_completion }}</span>
-                        </div>
-                        <div>
-                            <span class="font-medium">Status:</span>
-                            <span class="px-2 py-1 rounded text-xs {% if milestone.status == 'Completed' %}bg-green-100 text-green-800{% elif milestone.status == 'Active' %}bg-blue-100 text-blue-800{% else %}bg-gray-100 text-gray-800{% endif %}">
-                                {{ milestone.status }}
-                            </span>
-                        </div>
-
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
+      <div class="space-y-6">
+        {% for milestone in milestones %}
+          <div class="bg-customBlue rounded-lg shadow-lg p-6 border-l-4 {% if milestone.status == 'Completed' %}border-green-400{% elif milestone.status == 'Active' %}border-white{% else %}border-gray-300{% endif %} hover:shadow-xl transition-shadow duration-300">
+            <div class="flex justify-between items-start mb-4">
+              <h4 class="font-semibold text-xl text-white">{{ milestone.title }}</h4>
+              <span class="px-3 py-1 rounded-full text-sm font-medium {% if milestone.status == 'Completed' %}bg-green-500 text-white{% elif milestone.status == 'Active' %}bg-white text-blue-800{% else %}bg-gray-200 text-gray-800{% endif %}">
+                {{ milestone.status }}
+              </span>
+            </div>
+            
+            <p class="text-blue-100 mb-4 leading-relaxed">{{ milestone.description }}</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white/10 backdrop-blur-sm p-4 rounded-lg border border-white/20">
+              <div class="space-y-2">
+                <span class="font-medium text-blue-100 block">Deliverables:</span>
+                <span class="text-white">{{ milestone.deliverables }}</span>
+              </div>
+              <div class="space-y-2">
+                <span class="font-medium text-blue-100 block">Payment:</span>
+                <span class="text-white font-semibold">Ksh. {{ milestone.payment_amount }}</span>
+              </div>
+              <div class="space-y-2">
+                <span class="font-medium text-blue-100 block">Estimated Completion:</span>
+                <span class="text-white">{{ milestone.estimated_completion }}</span>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
     {% else %}
-        <div class="bg-gray-50 p-4 rounded-lg text-center">
-            <p>No milestones have been created for this project yet.</p>
-        </div>
+      <div class="bg-customBlue rounded-lg shadow-lg p-8 text-center">
+        <svg class="mx-auto h-12 w-12 text-blue-200 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <h3 class="text-lg font-medium text-white mb-2">No Milestones Yet</h3>
+        <p class="text-blue-100">No milestones have been created for this project yet.</p>
+      </div>
     {% endif %}
+  </div>
 </div>
-    </div>
 {% endblock %}
-

@@ -1,4 +1,7 @@
-{% load static %} {% include "sidebar.html" %} {% block content %}
+{% load static %} 
+{% include "sidebar.html" %} 
+{% block content %}
+
 <script src="{% static 'profile.js' %}"></script>
 <div class="p-4 sm:ml-64">
   <p class="text-2xl m-2 font-semibold tracking-tight leading-none text-black">
@@ -22,16 +25,16 @@
       <div class="block h-58 mb-4 rounded-xl bg-profile_gray max-w-screen-xl">
         <div class="flex items-center justify-between">
           <div class="block items-start">
-            <p class="text-lg ml-4 py-2 text-black font-semibold font-serif">
+            <p class="text-lg ml-4 py-2 text-black font-semibold">
               First Name: {{ user.first_name }}
             </p>
-            <p class="text-lg ml-4 py-2 text-black font-semibold font-serif">
+            <p class="text-lg ml-4 py-2 text-black font-semibold">
               Last Name: {{ user.last_name }}
             </p>
-            <p class="text-lg ml-4 py-2 text-black font-semibold font-serif">
+            <p class="text-lg ml-4 py-2 text-black font-semibold">
               Email: {{ user.email }}
             </p>
-            <p class="text-lg ml-4 py-2 text-black font-semibold font-serif">
+            <p class="text-lg ml-4 py-2 text-black font-semibold">
               Username: {{ user.username }}
             </p>
           </div>
@@ -48,14 +51,14 @@
       <div class="block h-58 mb-4 rounded-xl bg-profile_gray max-w-screen-xl">
         <div class="flex items-center justify-between">
           <div class="block items-start">
-            <p class="text-xl ml-4 py-2 text-black font-semibold font-serif">
+            <!-- <p class="text-xl ml-4 py-2 text-black font-semibold font-serif">
               Account type Information
-            </p>
+            </p> -->
             <div class="block items-start">
               <p
                 class="text-xl ml-4 py-2 text-black font-semibold font-serif"
               ></p>
-              <p class="text-lg ml-4 py-2 text-black font-semibold font-serif">
+              <p class="text-lg ml-4 py-2 text-black font-semibold">
                 Account type: {{ user_profile.role_type }}
               </p>
             </div>
@@ -83,11 +86,11 @@
       <div class="flex items-center justify-between">
         <div class="flex items-start">
           {% if user_profile %}
-          <p class="text-lg ml-4 py-2 text-black font-semibold font-serif">
+          <p class="text-lg ml-4 py-2 text-black font-semibold">
             Contact: {{ user_profile.phone_number }}
           </p>
           {% else %}
-          <p class="text-lg ml-4 py-2 text-black font-semibold font-serif">
+          <p class="text-lg ml-4 py-2 text-black font-semibold">
             Contact: No contact information available
           </p>
           {% endif %}
@@ -115,11 +118,11 @@
       <div class="flex items-center justify-between">
         <div class="flex items-start">
           {% if user_profile %}
-          <p class="text-lg ml-4 py-2 text-black font-semibold font-serif">
+          <p class="text-lg ml-4 py-2 text-black font-semibold">
             Mpesa Number: {{ user_profile.mpesa_number }}
           </p>
           {% else %}
-          <p class="text-lg ml-4 py-2 text-black font-semibold font-serif">
+          <p class="text-lg ml-4 py-2 text-black font-semibold">
             Mpesa Number: No payment information available
           </p>
           {% endif %}

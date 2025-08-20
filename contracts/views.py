@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponse
 from django.forms import modelformset_factory
 from django.urls import reverse
 from .models import ProjectRequest, Contract, ContractSection
@@ -11,8 +11,8 @@ from .services import create_contract_from_template
 from .forms import ContractSectionForm
 from django.core.management import call_command
 from projects.models import Milestone
-
-
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 
 def ensure_contract_templates_exist():
     call_command('initialize_contract_templates')
@@ -135,7 +135,7 @@ def download_contract_pdf(request, contract_id):
     if request.user.email != project.sender_email and request.user.email != project.receiver_email:
         return HttpResponseForbidden("You dont have access to this contract")
 
-    if not contract.is_signed_by_client or not contract.is_signed_by_freelancer:
+    if not contract.signed_by_client or not contract.signed_by_developer:
         return HttpResponseForbidden("Contract is not finalized yet")
 
     template_path = 'contracts/view_contract.html'

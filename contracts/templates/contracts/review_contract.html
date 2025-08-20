@@ -1,6 +1,7 @@
-{% extends 'base.html' %}
-
+{% load static %}
+{% include "sidebar.html" %}
 {% block content %}
+<div class="p-4 md:p-8 sm:ml-64 bg-gray-200 min-h-screen">
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
         <div class="px-6 py-8">
@@ -19,18 +20,18 @@
                 <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
                         <p class="font-semibold text-gray-800">Client</p>
-                        {% if contract.is_signed_by_client %}
+                        {% if contract.signed_by_client %}
                             <p class="text-green-600 font-bold">Signed</p>
-                            <p class="text-sm text-gray-500">{{ contract.project.client.get_full_name }}</p>
+                            <p class="text-sm text-gray-500">{{ contract.project.sender_email }}</p>
                         {% else %}
                             <p class="text-red-600 font-bold">Not Signed</p>
                         {% endif %}
                     </div>
                     <div>
-                        <p class="font-semibold text-gray-800">Freelancer</p>
-                        {% if contract.is_signed_by_freelancer %}
+                        <p class="font-semibold text-gray-800">Developer</p>
+                        {% if contract.signed_by_developer%}
                             <p class="text-green-600 font-bold">Signed</p>
-                            <p class="text-sm text-gray-500">{{ contract.project.freelancer.get_full_name }}</p>
+                            <p class="text-sm text-gray-500">{{ contract.project.receiver_email }}</p>
                         {% else %}
                             <p class="text-red-600 font-bold">Not Signed</p>
                         {% endif %}
@@ -47,5 +48,6 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 {% endblock %}

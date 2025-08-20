@@ -1,7 +1,7 @@
 {% load static %} {% include "sidebar.html" %} {% block content %}
 <script src="{% static 'createproject.js' %}"></script>
 
-<div class="p-4 sm:ml-64">
+<div class="p-4 sm:ml-64 min-h-screen">
   <p class="text-2xl m-2 font-semibold tracking-tight leading-none text-black">
     Projects
   </p>
@@ -23,13 +23,6 @@
           >
             Create Project
     </button>
-    <!-- <button
-            data-dialog-target="create-project-modal"
-            class="rounded-md mb-2 mr-3 bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
-            type="button"
-          >
-            Review Deliverables
-    </button> -->
    </div>
 {% if project_progress %}
     {% for item in project_progress %}
@@ -117,19 +110,20 @@
     </div>
   </div>
   {% endfor %}
-</div>
 
-{#    action button#}
+
     <div>
       <form action="{% url 'projects:client_verify_milestone' item.project.id %}" method="get">
-      <button type="submit"
-      class="h-11 w-48 mt-7 p-2 text-white bg-gray-900 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-      >
-          view milestones
-      </button>
-          </form>
+        <button type="submit"
+        class="h-11 w-48 mt-7 p-2 text-white bg-gray-900 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+        >
+            view milestones
+        </button>
+      </form>
   </div>
   {% endfor %}
+</div>
+
 
 {% else %}
 <div class="text-center py-12">

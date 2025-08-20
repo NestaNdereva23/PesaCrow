@@ -16,15 +16,6 @@ PesaCrow | Dashboard
           <p class="text-gray-700 mr-4">
             Welcome back, <span class="font-semibold">{{ user.username }}</span>!
           </p>
-          <div class="relative">
-            <input type="text" id="referral-link"
-                   class="text-xs text-gray-600 bg-gray-100 rounded-full px-4 py-2 w-64"
-                   value="https://pesacrow.com/ref/{{ user.username }}" readonly>
-            <button onclick="copyToClipboard()"
-                    class="absolute right-0 top-0 h-full px-4 bg-blue-500 text-white rounded-full text-xs hover:bg-blue-600">
-              Copy
-            </button>
-          </div>
         </div>
   </div>
 <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
@@ -99,7 +90,7 @@ PesaCrow | Dashboard
 
             {% if total > 0 %}
             <div class="mt-4">
-              <p class="text-xs mb-1 text-gray-200">Progress</p>
+              <p class="text-xs mb-1 text-black">Progress</p>
               <div class="w-full bg-gray-200 rounded-full h-2.5">
                 <div class="bg-green-500 h-2.5 rounded-full transition-all duration-300" style="width: {{ progress }}%;"></div>
               </div>
@@ -107,8 +98,8 @@ PesaCrow | Dashboard
             </div>
             {% endif %}
           </div>
-          <div class="bg-gray-100 px-6 py-3">
-            <a href="#" class="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800">
+          <div class="bg-gray-800 px-6 py-3">
+            <a href="#" class="inline-flex items-center text-sm font-medium text-gray-50 hover:text-blue-800">
               View Project
               <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />

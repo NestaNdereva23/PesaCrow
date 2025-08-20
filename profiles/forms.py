@@ -13,3 +13,9 @@ class ContactUpdateForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['role_type','phone_number', 'mpesa_number']
+
+#KYC Form file
+class KYCUpdateForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['id_document']

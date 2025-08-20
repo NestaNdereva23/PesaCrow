@@ -6,7 +6,8 @@ from django.views import generic
 from django_browser_reload.views import message
 
 from profiles.models import UserProfile
-from profiles.forms import ProfileUpdateForm, ContactUpdateForm
+from profiles.forms import ProfileUpdateForm, ContactUpdateForm, KYCUpdateForm
+
 
 
 # Create your views here.
@@ -25,6 +26,8 @@ def profiles(request):
     #userprofile update form
     form_profile = ProfileUpdateForm(data=request.POST, instance=user)
     form_contact = ContactUpdateForm(data=request.POST, instance=user_profile)
+    form_kyc = KYCUpdateForm(data=request.POST or None, files=request.FILES or None)
+
 
     if request.method == "POST":
         if 'formProfile_submit' in request.POST:
@@ -43,17 +46,23 @@ def profiles(request):
             else:
                 print(form_contact.errors)
 
+        elif 'formKYC_submit' in request.POST and form_kyc.is_valid():
+            kyc = form_kyc.save(commit=False)
+            kyc.user = request.user
+            kyc.kyc_status = 'pending'
+            kyc.save()
+            message.info(request, "KYC document uploaded. Waiting for verification")
+            return redirect(reverse('home:dashboard'))
+
     else:
         form_profile = ProfileUpdateForm(instance=user)
         form_contact = ContactUpdateForm(instance=user_profile)
-
-
-
 
     context = {
         'user_profile': user_profile,
         'form_profile': form_profile,
         'form_contact': form_contact,
+        'form_kyc':form_kyc,
     }
 
 

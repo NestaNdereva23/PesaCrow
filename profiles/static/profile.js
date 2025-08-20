@@ -41,6 +41,17 @@ document.addEventListener("DOMContentLoaded", function () {
     '[data-dialog="mpesa-number-modal"]'
   );
 
+   //KYC modal
+   const KYCModalButton = document.querySelector(
+    '[data-dialog-target="kyc-modal"]'
+  );
+  const KYCModalBackdrop = document.querySelector(
+    '[data-dialog-backdrop="kyc-modal"]'
+  );
+  const KYCModal = document.querySelector(
+    '[data-dialog="kyc-modal"]'
+  );
+
   // Function to open profile modal
   function openProfileModal() {
     profileModalBackdrop.classList.remove("pointer-events-none", "opacity-0");
@@ -97,12 +108,24 @@ document.addEventListener("DOMContentLoaded", function () {
     mpesaModalBackdrop.classList.add("pointer-events-none", "opacity-0");
   }
 
+  function openKYCModal() {
+    KYCModalBackdrop.classList.remove("pointer-events-none", "opacity-0");
+    KYCModalBackdrop.classList.add("opacity-100", "pointer-events-auto");
+  }
+  
+  // close KYC modal
+  function closeKYCModal() {
+    KYCModalBackdrop.classList.remove("opacity-100", "pointer-events-auto");
+    KYCModalBackdrop.classList.add("pointer-events-none", "opacity-0");
+  }
+
   // Function to close all modals
   function closeAllModals() {
     closeProfileModal();
     closeAccountTypeModal();
     closeContactModal();
     closeMpesaModal();
+    closeKYCModal();
   }
 
   // Add click event to profile modal button
@@ -111,6 +134,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // Make sure other modals are closed first
       closeContactModal();
       closeMpesaModal();
+      closeKYCModal();
       //open current modal
       openProfileModal();
     });
@@ -143,6 +167,19 @@ document.addEventListener("DOMContentLoaded", function () {
       closeProfileModal();
       // Then open this modal
       openMpesaModal();
+    });
+  }
+
+   // click event --> KYC modal button
+  if (KYCModalButton) {
+    KYCModalButton.addEventListener("click", function () {
+      // Make sure other modals are closed first
+      closeProfileModal();
+      closeAccountTypeModal();
+      closeContactModal();
+      closeMpesaModal();
+      // Then open this modal
+      openKYCModal();
     });
   }
 
@@ -190,6 +227,18 @@ document.addEventListener("DOMContentLoaded", function () {
     mpesaModalBackdrop.addEventListener("click", function (e) {
       if (e.target === mpesaModalBackdrop) {
         closeMpesaModal();
+      }
+    });
+  }
+
+   // Close KYC modal when  you clicck outside
+   if (
+    KYCModalBackdrop &&
+    KYCModalBackdrop.getAttribute("data-dialog-backdrop-close") === "true"
+  ) {
+    KYCModalBackdrop.addEventListener("click", function (e) {
+      if (e.target === KYCModalBackdrop) {
+        closeKYCModal();
       }
     });
   }

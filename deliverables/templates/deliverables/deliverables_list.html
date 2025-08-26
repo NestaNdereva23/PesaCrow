@@ -10,10 +10,10 @@
     <!-- Review & Feedback Screen -->
 {% if user.userprofile.role_type == 'Client' %}
         {% for deliverables in client_deliverables %}
-    <div class="bg-white shadow-lg rounded-lg p-6 mt-4">
+    <div class="bg-customBlue shadow-lg rounded-lg p-6 mt-4">
 
-        <form class="space-y-6" >
-{#            {% csrf_token %}#}
+        <form class="space-y-6 bg-customBlue" >
+            {% csrf_token %}
             <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Milestone:</label>

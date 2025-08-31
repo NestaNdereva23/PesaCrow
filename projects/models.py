@@ -37,7 +37,7 @@ class ProjectRequest(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return self.title
+        return f"{self.title} + {self.sender_email} + {self.receiver_email} + {self.status}"
 
 class Milestone(models.Model):
     project = models.ForeignKey(ProjectRequest, on_delete=models.CASCADE, related_name="project_milestones")

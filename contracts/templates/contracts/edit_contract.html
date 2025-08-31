@@ -12,14 +12,14 @@
         {% for msg in messages %}
             <p>{{ msg }}</p>
         {% endfor %}
-        <form method="post" action="{% url 'contracts:review_contract' contract.id %}" class="space-y-6">
+        <form method="post" action="{% url 'contracts:edit_contract' contract.id %}" class="space-y-6">
             {% csrf_token %}
 
             {{ formset.management_form }}
 
             <!-- Display fixed sections (not editable) -->
             {% for section in fixed_sections %}
-            <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <div class="bg-gray-300 shadow-md rounded-lg p-6 mb-6">
                 <div class="border-b border-gray-200 pb-4 mb-4">
                     <h3 class="text-xl font-semibold">{{ section.title }}</h3>
                 </div>
@@ -28,9 +28,9 @@
             {% endfor %}
 
             <!-- Display editable sections -->
-            {% if not contract.is_signed_by_client and not contract.is_signed_by_freelancer %}
+            {% if not contract.signed_by_client or not contract.signed_by_developer %}
                 {% for form in formset %}
-                <div class="bg-gray-50 shadow-md rounded-lg p-6 mb-6 editable-section" data-section-id="{{ form.instance.id }}">
+                <div class="bg-gray-200 shadow-md rounded-lg p-6 mb-6 editable-section" data-section-id="{{ form.instance.id }}">
                     <div class="border-b border-gray-200 pb-4 mb-4 flex justify-between items-center">
                         <h3 class="text-xl font-semibold">{{ form.instance.title }} (Editable)</h3>
                         <button type="button" class="button bg-blue-600 text-white py-1 px-3 rounded edit-button">Edit</button>
@@ -47,12 +47,10 @@
                 </div>
                 {% endfor %}
 
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Save All Changes
-                </button>
+                
             {% else %}
                 {% for section in contract.sections.all %}
-                <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+                <div class="bg-gray-300 shadow-md rounded-lg p-6 mb-6">
                     <div class="border-b border-gray-200 pb-4 mb-4">
                         <h3 class="text-xl font-semibold">{{ section.title }}</h3>
                     </div>
@@ -60,6 +58,9 @@
                 </div>
                 {% endfor %}
             {% endif %}
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Save All Changes
+            </button>
         </form>
 
     </div>

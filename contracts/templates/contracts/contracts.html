@@ -27,17 +27,19 @@
           <div>
             <h4 class="font-semibold text-gray-200 mb-2">Parties Involved:</h4>
             <div class="text-sm text-gray-300">
-              <p><span class="font-medium">Sender:</span> {{ contract.project.sender_email }}</p>
-              <p><span class="font-medium">Receiver:</span> {{ contract.project.receiver_email }}</p>
+              <p><span class="font-medium">Sender(Client):</span> {{ contract.project.sender_email }}</p>
+              <p><span class="font-medium">Receiver(Developer):</span> {{ contract.project.receiver_email }}</p>
             </div>
           </div>
 
           <div class="mt-6 flex justify-between items-center">
             <div>
-                {% if not contract.signed_by_client and not contract.signed_by_developer%}
+                {% if not contract.signed_by_client and not contract.signed_by_developer %}
                     <span class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-200 rounded-full">Draft</span>
+
                 {% elif not contract.signed_by_client or not contract.signed_by_developer %}
                     <span class="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-200 rounded-full">Awaiting Signatures</span>
+
                 {% else %}
                     <span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Finalized</span>
                 {% endif %}

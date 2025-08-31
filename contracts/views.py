@@ -68,10 +68,16 @@ def edit_contract(request, contract_id):
         formset = SectionFormSet(request.POST, queryset=editable_sections)
 
         if formset.is_valid():
-            formset.save()
-            messages.success(request, "Contract update successfully")
-            print("workinggggggggggggggggggg")
-            return redirect(reverse('contracts:review_contract'), contract_id=contract.id)
+            
+            instances = formset.save(commit=False)
+            for instance in instances: 
+                instance.save()
+            formset.save_m2m() #for many-to-many fields if any
+
+            messages.success(request, "Contract updated successfully")
+            
+            #redirect to the review_contract page
+            return redirect('contracts:review_contract', contract_id=contract.id)
         else:
             print(formset.errors)
 

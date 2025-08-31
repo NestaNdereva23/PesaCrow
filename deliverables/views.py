@@ -132,6 +132,9 @@ def review_deliverables(request, deliverable_id):
 
                 # Success message based on decision
                 if new_status == 'approved':
+                    milestone = deliverable.milestone
+                    milestone.status = "Completed"
+                    milestone.save()
                     messages.success(request, f"Deliverable '{deliverable.title}' has been approved. Funds will be released to the developer")
                 elif new_status == 'revision_requested':
                     messages.info(request, f"Revision requested for deliverable '{deliverable.title}'.")

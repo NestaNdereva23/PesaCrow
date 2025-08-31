@@ -10,7 +10,7 @@
     <!-- Review & Feedback Screen -->
     <div class="bg-gray-200 shadow-lg rounded-lg p-6 mt-4">
         {% if user.userprofile.role_type == 'Client' %}
-        <form class="space-y-6" method="post" action="{% url 'deliverables:review_deliverables' deliverable.id %}">
+        <form class="space-y-6 p-4" method="post" action="{% url 'deliverables:review_deliverables' deliverable.id %}">
             {% csrf_token %}
             <input type="hidden" name="deliverable_id" value="{{ deliverable.id }}">
                 <!-- Milestone Section -->
@@ -134,7 +134,7 @@
             <div class="pt-4">
                 <button
                     type="submit"
-                    class="w-full bg-indigo-600 text-white py-3 px-4 rounded-md font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+                    class="w-full bg-green-800 text-white py-3 px-4 rounded-md font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
                 >
                     Submit Review/Release Funds
                 </button>

@@ -12,7 +12,10 @@ from payment.services import release_funds
 # Create your views here.
 def disputes_list(request):
     user = request.user
-    disputes = Dispute.objects.filter(Q(raised_by=user) | Q(raised_against=user)).order_by('-created_at')
+    if user.is_superuser:
+        disputes = Dispute.objects.all().order_by('-created_at')
+    else:
+        disputes = Dispute.objects.filter(Q(raised_by=user) | Q(raised_against=user)).order_by('-created_at')
     print(disputes)
     context = {
         'disputes':disputes,
@@ -99,7 +102,7 @@ def escalate_dispute_manually(request, dispute_id):
         dispute.save()
         messages.info(request, "Dispute manually escalated to Admin for review")
     else:
-        messages.warning(request, f"This dispute is not 'open' and cannot be manually escalated. Current status: {dispute.get_status_display()}.")
+        messages.warning(request, f"This dispute is not 'open' and cannot be manually escalated. Current status: {dispute.get_status_display()}. ")
 
     return redirect(reverse('disputes:disputes_list'))
 

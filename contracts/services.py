@@ -26,7 +26,7 @@ def create_contract_from_template(project_id):
         #create section with content from template
         section = ContractSection.objects.create(
             contract=contract,
-            template=template,~
+            template=template,
             title=template.name,
             content=template.content,
             editable=editable,

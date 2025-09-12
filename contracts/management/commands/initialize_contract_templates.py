@@ -12,12 +12,10 @@ class Command(BaseCommand):
                 'section_key': 'parties_involved',
                 'content': """● Developer:
 ● Name/Company: [Your Company Name / Your Name]
-● Address: [Your Address]
 ● Email: [Your Email]
 ● Phone: [Your Phone Number]
 ● Client:
 ● Name/Company: [Client Name]
-● Address: [Client Address]
 ● Email: [Client Email]
 ● Phone: [Client Phone Number]"""
             },

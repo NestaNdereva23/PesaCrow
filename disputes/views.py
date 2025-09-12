@@ -16,9 +16,22 @@ def disputes_list(request):
         disputes = Dispute.objects.all().order_by('-created_at')
     else:
         disputes = Dispute.objects.filter(Q(raised_by=user) | Q(raised_against=user)).order_by('-created_at')
-    print(disputes)
+    
+    first_dispute = disputes.first()
+    dispute_messages = DisputeMessage.objects.filter(dispute=first_dispute)
+    evidence_list = Evidence.objects.filter(dispute=first_dispute)
+    message_form = DisputeMessageForm()
+    evidence_form = EvidenceForm()
+    ruling_form = RulingForm()
+
     context = {
-        'disputes':disputes,
+        'disputes': disputes,
+        'dispute': first_dispute,
+        'dispute_messages': dispute_messages,
+        'evidence_list': evidence_list,
+        'message_form': message_form,
+        'evidence_form': evidence_form,
+        'ruling_form': ruling_form,
     }
     return render(request, 'disputes/disputes_list.html', context)
 
@@ -106,8 +119,14 @@ def escalate_dispute_manually(request, dispute_id):
 
     return redirect(reverse('disputes:disputes_list'))
 
+@login_required
 def dispute_detail(request, dispute_id):
     dispute = get_object_or_404(Dispute, id=dispute_id)
+
+    # Authorization: only involved users or superuser can view
+    if not (request.user.is_superuser or request.user == dispute.raised_by or request.user == dispute.raised_against):
+        messages.error(request, "You are not authorized to view this dispute.")
+        return redirect(reverse('disputes:disputes_list'))
     dispute_messages = DisputeMessage.objects.filter(dispute=dispute)
     evidence_list = Evidence.objects.filter(dispute=dispute)
 
@@ -148,9 +167,17 @@ def dispute_detail(request, dispute_id):
 
             # Automated fund release logic
             if decision == 'developer_favored':
-                release_funds(dispute.raised_against.userprofile.phone_number, dispute.milestone.payment_amount)
+                success, message = release_funds(dispute.milestone)
+                if success:
+                    messages.success(request, "Funds released to the developer.")
+                else:
+                    messages.error(request, f"Error releasing funds: {message}")
             elif decision == 'client_favored':
-                release_funds(dispute.raised_by.userprofile.phone_number, dispute.milestone.payment_amount)
+                # Simulate refund to client
+                milestone = dispute.milestone
+                milestone.status = "Cancelled"
+                milestone.save()
+                messages.success(request, "Milestone cancelled and funds returned to the client.")
 
             messages.success(request, f"Dispute resolved. Decision: {decision}")
             return redirect('disputes:dispute_detail', dispute_id=dispute.id)
@@ -168,4 +195,4 @@ def dispute_detail(request, dispute_id):
         'evidence_form': evidence_form,
         'ruling_form': ruling_form,
     }
-    return render(request, 'disputes/dispute_detail.html', context)
+    return render(request, 'disputes/dispute_detail_page.html', context)

@@ -1,7 +1,7 @@
 
 {% block content %}
 <form
-  class="flex flex-col gap-4 mb-4 mt-4 p-4 bg-white rounded-lg shadow-sm border border-gray-200"
+  class="flex flex-col gap-4 mb-4 mt-4 p-4 bg-gray-300 rounded-lg shadow-sm border"
   hx-post="{% url 'projects:milestones' project.id %}"
   hx-swap="outerHTML"
   hx-target="this"

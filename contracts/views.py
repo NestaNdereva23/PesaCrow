@@ -44,7 +44,7 @@ def generate_contract(request, project_id):
     except Contract.DoesNotExist:
         contract = create_contract_from_template(project_id)
 
-    return redirect(reverse('contracts:edit_contract'), contract_id=contract.id)
+    return redirect('contracts:edit_contract', contract_id=contract.id)
 
 @login_required
 def edit_contract(request, contract_id):
@@ -53,41 +53,33 @@ def edit_contract(request, contract_id):
 
     if request.user.email != project.sender_email and request.user.email != project.receiver_email:
         return HttpResponseForbidden("You dont have access to this contract")
- 
-    editable_sections = contract.sections.filter(editable=True).order_by('order')
-    fixed_sections = contract.sections.filter(editable=False).order_by('order')
-
-    #create formsets for editable sections
-    SectionFormSet = modelformset_factory(
-        ContractSection,
-        form=ContractSectionForm,
-        extra=0
-    )
 
     if request.method == 'POST':
-        formset = SectionFormSet(request.POST, queryset=editable_sections)
-
-        if formset.is_valid():
-            
-            instances = formset.save(commit=False)
-            for instance in instances: 
-                instance.save()
-            formset.save_m2m() #for many-to-many fields if any
-
-            messages.success(request, "Contract updated successfully")
-            
-            #redirect to the review_contract page
-            return redirect('contracts:review_contract', contract_id=contract.id)
+        section_id = request.POST.get('section_id')
+        section = get_object_or_404(ContractSection, id=section_id, contract=contract, editable=True)
+        
+        form = ContractSectionForm(request.POST, instance=section)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Section '{section.title}' updated successfully.")
         else:
-            print(formset.errors)
+            messages.error(request, "There was an error updating the section.")
+        
+        return redirect('contracts:edit_contract', contract_id=contract.id)
 
-    else:
-        formset = SectionFormSet(queryset=editable_sections)
+    all_sections = contract.sections.all().order_by('order')
+    sections_with_forms = []
+    for section in all_sections:
+        form = None
+        if section.editable:
+            form = ContractSectionForm(instance=section)
+        sections_with_forms.append({'section': section, 'form': form})
 
-    context = {'contract':contract, 
-               'project':project, 
-               'formset':formset, 
-               'fixed_sections':fixed_sections}
+    context = {
+        'contract': contract,
+        'project': project,
+        'sections_with_forms': sections_with_forms
+    }
 
     return render(request, "contracts/edit_contract.html", context)
 
@@ -144,8 +136,9 @@ def download_contract_pdf(request, contract_id):
     if not contract.signed_by_client or not contract.signed_by_developer:
         return HttpResponseForbidden("Contract is not finalized yet")
 
-    template_path = 'contracts/view_contract.html'
-    context = {'contract': contract}
+    template_path = 'contracts/contract_pdf_template.html'
+    sections = contract.sections.all().order_by('order')
+    context = {'contract': contract, 'sections': sections}
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="contract_{contract.id}.pdf"'

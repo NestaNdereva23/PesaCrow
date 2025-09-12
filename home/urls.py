@@ -23,6 +23,7 @@ urlpatterns = [
 
     path('dashboard/', views.dashboard_view, name='dashboard'),
     path('admin-disputes/', views.admin_disputes, name='admin_disputes'),
+    path('payment-history/', views.payment_history, name='payment_history'),
 
     # path('dashboard/project_detail<int:id>' views.d)
 

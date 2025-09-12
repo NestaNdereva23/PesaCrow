@@ -9,7 +9,8 @@ class MilestonePayment(models.Model):
     # Use the detailed payment statuses here
     PAYMENT_STATUS = [
         ("Pending", "Pending"),      # Payment initiated, waiting for completion
-        ("Complete", "Complete"),    # Payment successful 
+        ("Complete", "Complete"),    # Payment successful
+        ("Released", "Released"),    # Funds released to the developer
         ("Failed", "Failed"),       # Payment failed
         ("Cancelled", "Cancelled"), # Payment cancelled
     ]

@@ -8,7 +8,7 @@
     <hr class="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700" />
 
     <!-- Review & Feedback Screen -->
-    <div class="bg-gray-200 shadow-lg rounded-lg p-6 mt-4">
+    <div class="bg-gray-300 shadow-lg rounded-lg p-6 mt-4">
         {% if user.userprofile.role_type == 'Client' %}
         <form class="space-y-6 p-4" method="post" action="{% url 'deliverables:review_deliverables' deliverable.id %}">
             {% csrf_token %}

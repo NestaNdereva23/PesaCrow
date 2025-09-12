@@ -17,6 +17,7 @@ from django.views.generic import TemplateView
 from django.db.models import Count, Sum, Q
 from disputes.models import Dispute, Deliverable
 from payment.models import MilestonePayment
+from payment.services import get_escrow_balance
 # Create your views here.
 from django.contrib.admin.views.decorators import staff_member_required
 
@@ -115,9 +116,7 @@ def dashboard_view(request):
         project__in=active_projects, status='Pending'
     )
 
-    escrow_total = Milestone.objects.filter(
-        project__in=active_projects, payment_status='Paid'
-    ).aggregate(total=Sum('payment_amount'))['total'] or 0
+    escrow_total = get_escrow_balance()
 
     disputes = Dispute.objects.filter(
         Q(raised_by=user) | Q(raised_against=user)
@@ -158,3 +157,26 @@ def admin_disputes(request):
         'disputes': escalated_disputes,
     }
     return render(request, 'home/admin_disputes.html', context)
+
+
+@login_required
+def payment_history(request):
+    user = request.user
+    profile = user.userprofile
+    is_client = profile.role_type == 'Client'
+
+    if is_client:
+        payments = MilestonePayment.objects.filter(
+            milestone__project__user=user,
+            status__in=['Complete', 'Released']
+        ).order_by('-created_at')
+    else:
+        payments = MilestonePayment.objects.filter(
+            milestone__project__receiver_email=user.email,
+            status__in=['Complete', 'Released']
+        ).order_by('-created_at')
+
+    context = {
+        'payment_history': payments
+    }
+    return render(request, 'home/payment_history.html', context)

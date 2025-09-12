@@ -99,7 +99,7 @@ PesaCrow | Dashboard
             {% endif %}
           </div>
           <div class="bg-gray-800 px-6 py-3">
-            <a href="#" class="inline-flex items-center text-sm font-medium text-gray-50 hover:text-blue-800">
+            <a href="#" class="inline-flex items-center text-sm font-medium text-green-600 hover:text-blue-800">
               View Project
               <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -139,7 +139,7 @@ PesaCrow | Dashboard
             <p class="text-sm text-white">{{ d.title }}</p>
             <p class="text-xs text-gray-200">Project: {{ d.milestone.project.title }}</p>
           </div>
-          <a href="{{ d.get_review_url }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+          <a href="#" class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
             Review
             <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -194,7 +194,10 @@ PesaCrow | Dashboard
 
 <!-- Recent Activity -->
 <div class="mt-10">
-    <h2 class="text-2xl font-bold text-black mb-4">Recent Activity</h2>
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold text-black">Recent Activity</h2>
+        <a href="{% url 'home:payment_history' %}" class="text-sm font-medium text-green-600 hover:text-blue-800">View All</a>
+    </div>
     <div class="bg-white rounded-lg shadow-lg p-6">
         <ul class="divide-y divide-gray-200">
             {% for payment in recent_payments %}
@@ -205,7 +208,7 @@ PesaCrow | Dashboard
                 </div>
                 <div class="text-right">
                     <p class="text-sm font-semibold text-green-600">Ksh. {{ payment.amount }}</p>
-                    <p class="text-xs text-gray-500">{{ payment.timestamp|date:"F j, Y, g:i a" }}</p>
+                    <p class="text-xs text-gray-500">{{ payment.created_at|date:"F j, Y, g:i a" }}</p>
                 </div>
             </li>
             {% empty %}

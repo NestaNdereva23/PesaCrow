@@ -24,20 +24,24 @@
     <div class="grid grid-cols-2 gap-4 mb-4">
       <div class="block h-58 mb-4 rounded-xl bg-profile_gray max-w-screen-xl">
         <div class="flex items-center justify-between">
-          <div class="block items-start">
-            <p class="text-lg ml-4 py-2 text-black font-semibold">
-              First Name: {{ user.first_name }}
-            </p>
-            <p class="text-lg ml-4 py-2 text-black font-semibold">
-              Last Name: {{ user.last_name }}
-            </p>
-            <p class="text-lg ml-4 py-2 text-black font-semibold">
-              Email: {{ user.email }}
-            </p>
-            <p class="text-lg ml-4 py-2 text-black font-semibold">
-              Username: {{ user.username }}
-            </p>
-          </div>
+                  <div class="space-y-3">
+            <div class="flex items-center">
+                <span class="text-lg font-semibold text-gray-600 mr-2">First Name:</span>
+                <span class="text-lg text-black font-semibold">{{ user.first_name }}</span>
+            </div>
+            <div class="flex items-center">
+                <span class="text-lg font-semibold text-gray-600 mr-2">Last Name:</span>
+                <span class="text-lg text-black font-semibold">{{ user.last_name }}</span>
+            </div>
+            <div class="flex items-center">
+                <span class="text-lg font-semibold text-gray-600 mr-2">Email:</span>
+                <span class="text-lg text-black font-semibold">{{ user.email }}</span>
+            </div>
+            <div class="flex items-center">
+                <span class="text-lg font-semibold text-gray-600 mr-2">Username:</span>
+                <span class="text-lg text-black font-semibold">{{ user.username }}</span>
+            </div>
+        </div>
           <button
             data-dialog-target="profile-info-modal"
             class="rounded-md mb-2 mr-3 bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
@@ -58,9 +62,12 @@
               <p
                 class="text-xl ml-4 py-2 text-black font-semibold font-serif"
               ></p>
-              <p class="text-lg ml-4 py-2 text-black font-semibold">
-                Account type: {{ user_profile.role_type }}
-              </p>
+              <div class="flex items-center">
+              <span class="text-lg ml-4 py-2 text-gray-600 font-semibold mr-2">Account type:</span> 
+              <span class="text-lg text-black font-semibold">
+                {{ user_profile.role_type }}
+              </span>
+
             </div>
             <button
               data-dialog-target="account-type-modal"
@@ -128,13 +135,13 @@
           {% endif %}
         </div>
         <!-- contact modal section -->
-        <button
-          data-dialog-target="contact-modal"
-          class="rounded-md m-3 bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
-          type="button"
-        >
-          Contact Update
-        </button>
+<!--        <button-->
+<!--          data-dialog-target="contact-modal"-->
+<!--          class="rounded-md m-3 bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"-->
+<!--          type="button"-->
+<!--        >-->
+<!--          Contact Update-->
+<!--        </button>-->
       </div>
     </div>
   </div>
@@ -159,13 +166,13 @@
           </p>
           {% endif %}
         </div>
-        <button
-          data-dialog-target="mpesa-number-modal"
-          class="rounded-md m-3 bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
-          type="button"
-        >
-          Mpesa no Update
-        </button>
+<!--        <button-->
+<!--          data-dialog-target="mpesa-number-modal"-->
+<!--          class="rounded-md m-3 bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"-->
+<!--          type="button"-->
+<!--        >-->
+<!--          Mpesa no Update-->
+<!--        </button>-->
       </div>
     </div>
   </div>

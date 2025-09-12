@@ -21,12 +21,12 @@ def create_contract_from_template(project_id):
 
     for index, template in enumerate(templates):
         #determine of certain section is editable or not
-        editable = template.section_key in ['parties involved', 'payment_schedule', 'timeline', 'milestones', 'Scope of Work']
+        editable = template.section_key in ['parties_involved', 'project_details', 'technical_specifications', 'scope_of_work', 'budget_and_payment', 'client_responsibilities']
 
         #create section with content from template
         section = ContractSection.objects.create(
             contract=contract,
-            template=template,
+            template=template,~
             title=template.name,
             content=template.content,
             editable=editable,
@@ -75,13 +75,11 @@ def populate_contract_with_project_data(contract, project_request):
 
                 #replave placeholders with actual data
                 parties_content = parties_content.replace('[Your Company Name / Your Name]', developer.get_full_name())
-                # parties_content = parties_content.replace('[Your Address]', developer.profile.address)
                 parties_content = parties_content.replace('[Your Email]', developer.email)
                 parties_content = parties_content.replace('[Your Phone Number]', developer_profile.phone_number)
 
             if client and client_profile:
                 parties_content = parties_content.replace('[Client Name]', client.get_full_name())
-                # parties_content = parties_content.replace('[Client Address]', client.profile.address)
                 parties_content = parties_content.replace('[Client Email]', client.email)
                 parties_content = parties_content.replace('[Client Phone Number]', client_profile.phone_number)
 

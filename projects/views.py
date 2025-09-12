@@ -1,3 +1,4 @@
+# noinspection PyPackageRequirements
 from django.db.models import Max
 from django.http import HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404

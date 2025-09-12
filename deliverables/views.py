@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.db import transaction
 from .models import Milestone, Deliverable, DeliverableReview
 from .forms import DeliverableSubmissionForm, DeliverableReviewForm
+from payment.services import release_funds
 
 
 ''' Handle deliverable submission from developer to client'''
@@ -133,9 +134,11 @@ def review_deliverables(request, deliverable_id):
                 # Success message based on decision
                 if new_status == 'approved':
                     milestone = deliverable.milestone
-                    milestone.status = "Completed"
-                    milestone.save()
-                    messages.success(request, f"Deliverable '{deliverable.title}' has been approved. Funds will be released to the developer")
+                    success, message = release_funds(milestone)
+                    if success:
+                        messages.success(request, f"Deliverable '{deliverable.title}' has been approved. Funds will be released to the developer")
+                    else:
+                        messages.error(request, f"Error releasing funds: {message}")
                 elif new_status == 'revision_requested':
                     messages.info(request, f"Revision requested for deliverable '{deliverable.title}'.")
                 else:  # rejected

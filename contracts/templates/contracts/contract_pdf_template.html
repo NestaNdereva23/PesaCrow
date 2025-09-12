@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Contract</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+        }
+        h1, h2, h3 {
+            font-weight: bold;
+        }
+        .contract-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .signatures {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature-block {
+            width: 45%;
+        }
+    </style>
+</head>
+<body>
+    <div class="contract-title">
+        <h1>Contract</h1>
+        <h2>{{ contract.project.title }}</h2>
+    </div>
+
+    {% for section in sections %}
+    <div class="section">
+        <h3>{{ section.title }}</h3>
+        <div>{{ section.content|safe }}</div>
+    </div>
+    {% endfor %}
+
+    <div class="signatures">
+        <div class="signature-block">
+            <h3>Client</h3>
+            {% if contract.signed_by_client %}
+                <p>Signed</p>
+                <p>{{ contract.project.sender_email }}</p>
+            {% else %}
+                <p>Not Signed</p>
+            {% endif %}
+        </div>
+        <div class="signature-block">
+            <h3>Developer</h3>
+            {% if contract.signed_by_developer %}
+                <p>Signed</p>
+                <p>{{ contract.project.receiver_email }}</p>
+            {% else %}
+                <p>Not Signed</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
